@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Organizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --bg: #ecf0f1;
+            --card: #ffffff;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --border: #bdc3c7;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Anton', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Header */
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1rem;
+            font-weight: 300;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Phase Selector */
+        .phase-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .phase-btn {
+            font-family: 'Anton', sans-serif;
+            font-size: 1.2rem;
+            padding: 1rem 2rem;
+            background: var(--card);
+            border: 3px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .phase-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .phase-btn.active {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        /* Control Panel */
+        .controls {
+            background: var(--card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        button {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-danger {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-secondary {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: #95a5a6;
+        }
+
+        /* Photo Display */
+        .photo-display {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 2rem;
+            min-height: 500px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .drop-zone {
+            border: 3px dashed var(--border);
+            border-radius: 12px;
+            padding: 4rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--secondary);
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        .drop-zone h2 {
+            font-size: 2rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .drop-zone p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        /* Current Photo View */
+        .current-photo {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .current-photo.active {
+            display: flex;
+        }
+
+        .photo-preview {
+            max-width: 100%;
+            max-height: 500px;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .photo-info {
+            width: 100%;
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .photo-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .photo-stats {
+            display: flex;
+            gap: 2rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Rating Stars */
+        .rating {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .star {
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--border);
+            transition: all 0.2s;
+        }
+
+        .star:hover, .star.active {
+            color: var(--warning);
+            transform: scale(1.1);
+        }
+
+        /* Gallery Grid */
+        .gallery-grid {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .gallery-grid.active {
+            display: grid;
+        }
+
+        .gallery-item {
+            position: relative;
+            background: var(--card);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+
+        .gallery-item.selected {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .gallery-item-info {
+            padding: 0.75rem;
+        }
+
+        .gallery-item-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .gallery-item-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        .tag {
+            background: var(--secondary);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .tag.person { background: #9b59b6; }
+        .tag.location { background: #16a085; }
+        .tag.event { background: #e67e22; }
+
+        /* Sidebar Panels */
+        .sidebar {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h3 {
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .album-list, .tag-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .album-item, .tag-item {
+            padding: 0.75rem;
+            background: var(--bg);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .album-item:hover, .tag-item:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .album-item.active, .tag-item.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* Input Fields */
+        input[type="text"], select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            background: var(--bg);
+            border-radius: 8px;
+            height: 30px;
+            margin: 1rem 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: var(--success);
+            height: 100%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        /* Stats Display */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-card {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Anton', sans-serif;
+            font-size: 2rem;
+            color: var(--secondary);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Hidden Elements */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Keyboard Shortcuts Info */
+        .shortcuts {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .shortcuts h4 {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .shortcuts p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* Two Column Layout for Organize Phase */
+        .organize-layout {
+            display: none;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        .organize-layout.active {
+            display: grid;
+        }
+
+        @media (max-width: 768px) {
+            .organize-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .phase-selector {
+                flex-direction: column;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Photo Organizer</h1>
+        <p>Organize Your Photos with Ease</p>
+    </header>
+
+    <div class="container">
+        <!-- Phase Selector -->
+        <div class="phase-selector">
+            <button class="phase-btn active" data-phase="cull">PHASE 1: Sort & Rate</button>
+            <button class="phase-btn" data-phase="organize">PHASE 2: Organize & Tag</button>
+        </div>
+
+        <!-- PHASE 1: CULL & RATE -->
+        <div id="cullPhase" class="phase-content">
+            <!-- Controls -->
+            <div class="controls">
+                <div class="button-group">
+                    <button class="btn-primary" id="loadPhotosBtn">Load Photos</button>
+                    <button class="btn-success" id="keepBtn" disabled>✓ Keep (K)</button>
+                    <button class="btn-danger" id="discardBtn" disabled>✗ Discard (D)</button>
+                    <button class="btn-secondary" id="undoBtn" disabled>← Undo (U)</button>
+                    <button class="btn-secondary" id="saveProgressBtn">Save Progress</button>
+                    <button class="btn-secondary" id="loadProgressBtn">Load Progress</button>
+                </div>
+
+                <div class="shortcuts">
+                    <h4>Keyboard Shortcuts:</h4>
+                    <p>← Previous | → Next | K = Keep | D = Discard | U = Undo | 1-5 = Star Rating</p>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalPhotos">0</div>
+                    <div class="stat-label">Total Photos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="keptPhotos">0</div>
+                    <div class="stat-label">Kept</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="discardedPhotos">0</div>
+                    <div class="stat-label">Discarded</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="remainingPhotos">0</div>
+                    <div class="stat-label">Remaining</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+            </div>
+
+            <!-- Photo Display -->
+            <div class="photo-display">
+                <div class="drop-zone" id="dropZone">
+                    <h2>DRAG & DROP PHOTOS HERE</h2>
+                    <p>Or click "Load Photos" button above</p>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;">Supports: JPG, PNG, GIF, WebP</p>
+                </div>
+
+                <div class="current-photo" id="currentPhotoView">
+                    <img class="photo-preview" id="photoPreview" src="" alt="Photo preview">
+                    
+                    <div class="photo-info">
+                        <div class="photo-name" id="photoName"></div>
+                        <div class="photo-stats">
+                            <span>Photo <span id="currentIndex">0</span> of <span id="totalCount">0</span></span>
+                            <span id="photoSize"></span>
+                        </div>
+                    </div>
+
+                    <div class="rating" id="starRating">
+                        <span class="star" data-rating="1">★</span>
+                        <span class="star" data-rating="2">★</span>
+                        <span class="star" data-rating="3">★</span>
+                        <span class="star" data-rating="4">★</span>
+                        <span class="star" data-rating="5">★</span>
+                    </div>
+
+                    <div class="button-group" style="justify-content: center;">
+                        <button class="btn-secondary" id="prevBtn">← Previous</button>
+                        <button class="btn-secondary" id="nextBtn">Next →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PHASE 2: ORGANIZE -->
+        <div id="organizePhase" class="phase-content hidden">
+            <div class="controls">
+                <div class="button-group">
+                    <button class="btn-primary" id="createAlbumBtn">+ Create Album</button>
+                    <button class="btn-primary" id="createTagBtn">+ Create Tag</button>
+                    <button class="btn-primary" id="bulkRenameBtn" disabled>Batch Rename</button>
+                    <button class="btn-primary" id="bulkTagBtn" disabled>Bulk Tag</button>
+                    <button class="btn-success" id="downloadOrganizedBtn" style="font-weight: 700;">📦 Download Organized Photos</button>
+                    <button class="btn-secondary" id="exportDataBtn">Export Data (JSON)</button>
+                    <button class="btn-secondary" id="selectAllBtn">Select All</button>
+                    <button class="btn-secondary" id="deselectAllBtn">Deselect All</button>
+                </div>
+                <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-light);">
+                    <strong>Tip:</strong> Click photos to select them (they get a blue border). Then use Batch Rename or Bulk Tag.
+                    <strong>Download Organized Photos</strong> creates a ZIP file with folders and renamed photos.
+                </p>
+            </div>
+
+            <div class="organize-layout" id="organizeLayout">
+                <!-- Sidebar -->
+                <div class="sidebar-container">
+                    <div class="sidebar">
+                        <h3>Albums</h3>
+                        <div class="album-list" id="albumList">
+                            <div class="album-item active" data-album="all">
+                                <span>All Photos</span>
+                                <span id="allPhotosCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar">
+                        <h3>Filters</h3>
+                        <select id="filterRating">
+                            <option value="">All Ratings</option>
+                            <option value="5">5 Stars</option>
+                            <option value="4">4+ Stars</option>
+                            <option value="3">3+ Stars</option>
+                            <option value="2">2+ Stars</option>
+                            <option value="1">1+ Stars</option>
+                        </select>
+                        <select id="filterTag">
+                            <option value="">All Tags</option>
+                        </select>
+                    </div>
+
+                    <div class="sidebar">
+                        <h3>Quick Tags</h3>
+                        <div class="tag-list" id="quickTagList"></div>
+                    </div>
+                </div>
+
+                <!-- Gallery -->
+                <div class="gallery-container">
+                    <div class="gallery-grid" id="photoGallery"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="albumModal">
+        <div class="modal-content">
+            <h2>Create Album</h2>
+            <input type="text" id="albumNameInput" placeholder="Album name (e.g., Hawaii Vacation 2023)">
+            <div class="modal-buttons">
+                <button class="btn-primary" id="saveAlbumBtn">Create</button>
+                <button class="btn-secondary" id="cancelAlbumBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="tagModal">
+        <div class="modal-content">
+            <h2>Create Tag</h2>
+            <input type="text" id="tagNameInput" placeholder="Tag name (e.g., Mom, Dad, Sarah)">
+            <select id="tagTypeSelect">
+                <option value="person">Person</option>
+                <option value="location">Location</option>
+                <option value="event">Event</option>
+            </select>
+            <div class="modal-buttons">
+                <button class="btn-primary" id="saveTagBtn">Create</button>
+                <button class="btn-secondary" id="cancelTagBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="renameModal">
+        <div class="modal-content">
+            <h2>Batch Rename</h2>
+            <p>Selected photos: <span id="renameCount">0</span></p>
+            <input type="text" id="renamePattern" placeholder="e.g., Hawaii Trip 2023 -">
+            <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--text-light);">
+                Files will be named: [Pattern] 001, [Pattern] 002, etc.
+            </p>
+            <div class="modal-buttons">
+                <button class="btn-primary" id="applyRenameBtn">Apply</button>
+                <button class="btn-secondary" id="cancelRenameBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="bulkTagModal">
+        <div class="modal-content">
+            <h2>Bulk Tag</h2>
+            <p>Selected photos: <span id="bulkTagCount">0</span></p>
+            <div id="bulkTagCheckboxes"></div>
+            <div class="modal-buttons">
+                <button class="btn-primary" id="applyBulkTagBtn">Apply</button>
+                <button class="btn-secondary" id="cancelBulkTagBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+
+    <script>
+        // Global State
+        const state = {
+            photos: [],
+            currentIndex: 0,
+            kept: [],
+            discarded: [],
+            albums: [],
+            tags: [],
+            selectedPhotos: [],
+            currentAlbum: 'all',
+            filters: {
+                rating: '',
+                tag: ''
+            },
+            undoStack: []
+        };
+
+        // DOM Elements
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+        const photoPreview = document.getElementById('photoPreview');
+        const currentPhotoView = document.getElementById('currentPhotoView');
+        const photoName = document.getElementById('photoName');
+        const photoSize = document.getElementById('photoSize');
+        const currentIndex = document.getElementById('currentIndex');
+        const totalCount = document.getElementById('totalCount');
+        const progressFill = document.getElementById('progressFill');
+        const starRating = document.getElementById('starRating');
+        const photoGallery = document.getElementById('photoGallery');
+
+        // Phase Switching
+        document.querySelectorAll('.phase-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const phase = btn.dataset.phase;
+                document.querySelectorAll('.phase-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                document.getElementById('cullPhase').classList.toggle('hidden', phase !== 'cull');
+                document.getElementById('organizePhase').classList.toggle('hidden', phase !== 'organize');
+                
+                if (phase === 'organize') {
+                    document.getElementById('organizeLayout').classList.add('active');
+                    renderGallery();
+                    updateStats();
+                }
+            });
+        });
+
+        // File Loading
+        document.getElementById('loadPhotosBtn').addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            loadPhotos(Array.from(e.target.files));
+            e.target.value = ''; // Reset file input
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+            loadPhotos(files);
+        });
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        function loadPhotos(files) {
+            if (files.length === 0) return;
+            
+            const startingLength = state.photos.length;
+            let loadedCount = 0;
+            
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    state.photos.push({
+                        id: Date.now() + Math.random() + index,
+                        name: file.name,
+                        originalName: file.name,
+                        size: file.size,
+                        url: e.target.result,
+                        rating: 0,
+                        status: 'pending',
+                        albums: [],
+                        tags: []
+                    });
+                    
+                    loadedCount++;
+                    
+                    // Only initialize when ALL files from this batch are loaded
+                    if (loadedCount === files.length) {
+                        if (startingLength === 0) {
+                            initializeViewing();
+                        } else {
+                            updateStats();
+                        }
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function initializeViewing() {
+            dropZone.style.display = 'none';
+            currentPhotoView.classList.add('active');
+            state.currentIndex = 0;
+            showPhoto(0);
+            updateStats();
+            enableControls();
+        }
+
+        function showPhoto(index) {
+            if (state.photos.length === 0) return;
+            
+            // Clamp index to valid range
+            index = Math.max(0, Math.min(index, state.photos.length - 1));
+            state.currentIndex = index;
+            
+            const photo = state.photos[index];
+            if (!photo) return;
+            
+            photoPreview.src = photo.url;
+            photoName.textContent = photo.name;
+            photoSize.textContent = formatFileSize(photo.size);
+            currentIndex.textContent = index + 1;
+            totalCount.textContent = state.photos.length;
+            
+            // Update stars
+            document.querySelectorAll('.star').forEach((star, i) => {
+                star.classList.toggle('active', i < photo.rating);
+            });
+            
+            // Update button states
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = index === state.photos.length - 1;
+            
+            updateProgress();
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function enableControls() {
+            document.getElementById('keepBtn').disabled = false;
+            document.getElementById('discardBtn').disabled = false;
+        }
+
+        // Photo Actions
+        document.getElementById('keepBtn').addEventListener('click', () => markPhoto('kept'));
+        document.getElementById('discardBtn').addEventListener('click', () => markPhoto('discarded'));
+
+        function markPhoto(status) {
+            const photo = state.photos[state.currentIndex];
+            
+            // Don't mark if already marked with this status
+            if (photo.status === status) {
+                nextPhoto();
+                return;
+            }
+            
+            state.undoStack.push({
+                action: 'mark',
+                photo: {...photo},
+                index: state.currentIndex
+            });
+            
+            // Remove from previous arrays if status is changing
+            if (photo.status === 'kept') {
+                state.kept = state.kept.filter(p => p.id !== photo.id);
+            } else if (photo.status === 'discarded') {
+                state.discarded = state.discarded.filter(p => p.id !== photo.id);
+            }
+            
+            // Update status and add to appropriate array
+            photo.status = status;
+            if (status === 'kept') {
+                state.kept.push(photo);
+            } else if (status === 'discarded') {
+                state.discarded.push(photo);
+            }
+            
+            document.getElementById('undoBtn').disabled = false;
+            nextPhoto();
+            updateStats();
+        }
+
+        function nextPhoto() {
+            if (state.currentIndex < state.photos.length - 1) {
+                state.currentIndex++;
+                showPhoto(state.currentIndex);
+            }
+        }
+
+        function previousPhoto() {
+            if (state.currentIndex > 0) {
+                state.currentIndex--;
+                showPhoto(state.currentIndex);
+            }
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', nextPhoto);
+        document.getElementById('prevBtn').addEventListener('click', previousPhoto);
+
+        // Undo
+        document.getElementById('undoBtn').addEventListener('click', () => {
+            if (state.undoStack.length === 0) return;
+            
+            const lastAction = state.undoStack.pop();
+            if (lastAction.action === 'mark') {
+                const photo = state.photos[lastAction.index];
+                photo.status = 'pending';
+                state.kept = state.kept.filter(p => p.id !== photo.id);
+                state.discarded = state.discarded.filter(p => p.id !== photo.id);
+                updateStats();
+            }
+            
+            if (state.undoStack.length === 0) {
+                document.getElementById('undoBtn').disabled = true;
+            }
+        });
+
+        // Star Rating
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', () => {
+                if (state.photos.length === 0 || !state.photos[state.currentIndex]) return;
+                
+                const rating = parseInt(star.dataset.rating);
+                state.photos[state.currentIndex].rating = rating;
+                document.querySelectorAll('.star').forEach((s, i) => {
+                    s.classList.toggle('active', i < rating);
+                });
+            });
+        });
+
+        // Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Don't trigger shortcuts when typing in inputs or modals are open
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                return;
+            }
+            
+            if (document.querySelector('.modal.active')) {
+                return;
+            }
+            
+            if (document.getElementById('organizePhase').classList.contains('hidden')) {
+                // Only allow shortcuts if we have photos loaded
+                if (state.photos.length === 0) return;
+                
+                // Cull phase shortcuts
+                if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    nextPhoto();
+                }
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    previousPhoto();
+                }
+                if (e.key.toLowerCase() === 'k') {
+                    e.preventDefault();
+                    markPhoto('kept');
+                }
+                if (e.key.toLowerCase() === 'd') {
+                    e.preventDefault();
+                    markPhoto('discarded');
+                }
+                if (e.key.toLowerCase() === 'u') {
+                    e.preventDefault();
+                    document.getElementById('undoBtn').click();
+                }
+                if (e.key >= '1' && e.key <= '5') {
+                    e.preventDefault();
+                    const rating = parseInt(e.key);
+                    if (state.photos[state.currentIndex]) {
+                        state.photos[state.currentIndex].rating = rating;
+                        document.querySelectorAll('.star').forEach((s, i) => {
+                            s.classList.toggle('active', i < rating);
+                        });
+                    }
+                }
+            }
+        });
+
+        // Update Stats
+        function updateStats() {
+            document.getElementById('totalPhotos').textContent = state.photos.length;
+            document.getElementById('keptPhotos').textContent = state.kept.length;
+            document.getElementById('discardedPhotos').textContent = state.discarded.length;
+            document.getElementById('remainingPhotos').textContent = 
+                state.photos.filter(p => p.status === 'pending').length;
+            document.getElementById('allPhotosCount').textContent = state.kept.length;
+        }
+
+        function updateProgress() {
+            const reviewed = state.kept.length + state.discarded.length;
+            const percentage = state.photos.length > 0 
+                ? Math.round((reviewed / state.photos.length) * 100) 
+                : 0;
+            progressFill.style.width = percentage + '%';
+            progressFill.textContent = percentage + '%';
+        }
+
+        // PHASE 2: ORGANIZE
+
+        // Create Album
+        document.getElementById('createAlbumBtn').addEventListener('click', () => {
+            document.getElementById('albumModal').classList.add('active');
+            document.getElementById('albumNameInput').value = '';
+        });
+
+        document.getElementById('saveAlbumBtn').addEventListener('click', () => {
+            const name = document.getElementById('albumNameInput').value.trim();
+            if (name) {
+                state.albums.push({
+                    id: Date.now(),
+                    name: name,
+                    photos: []
+                });
+                renderAlbums();
+                document.getElementById('albumModal').classList.remove('active');
+            }
+        });
+
+        document.getElementById('cancelAlbumBtn').addEventListener('click', () => {
+            document.getElementById('albumModal').classList.remove('active');
+        });
+
+        function renderAlbums() {
+            const albumList = document.getElementById('albumList');
+            const existing = albumList.querySelector('[data-album="all"]');
+            albumList.innerHTML = '';
+            albumList.appendChild(existing);
+            
+            state.albums.forEach(album => {
+                const div = document.createElement('div');
+                div.className = 'album-item';
+                div.dataset.album = album.id;
+                div.innerHTML = `<span>${album.name}</span><span>${album.photos.length}</span>`;
+                div.addEventListener('click', () => {
+                    document.querySelectorAll('.album-item').forEach(a => a.classList.remove('active'));
+                    div.classList.add('active');
+                    state.currentAlbum = album.id;
+                    renderGallery();
+                });
+                albumList.appendChild(div);
+            });
+        }
+
+        // Create Tag
+        document.getElementById('createTagBtn').addEventListener('click', () => {
+            document.getElementById('tagModal').classList.add('active');
+            document.getElementById('tagNameInput').value = '';
+        });
+
+        document.getElementById('saveTagBtn').addEventListener('click', () => {
+            const name = document.getElementById('tagNameInput').value.trim();
+            const type = document.getElementById('tagTypeSelect').value;
+            if (name) {
+                state.tags.push({
+                    id: Date.now(),
+                    name: name,
+                    type: type
+                });
+                renderTags();
+                updateFilterTags();
+                document.getElementById('tagModal').classList.remove('active');
+            }
+        });
+
+        document.getElementById('cancelTagBtn').addEventListener('click', () => {
+            document.getElementById('tagModal').classList.remove('active');
+        });
+
+        function renderTags() {
+            const tagList = document.getElementById('quickTagList');
+            tagList.innerHTML = '';
+            
+            state.tags.forEach(tag => {
+                const div = document.createElement('div');
+                div.className = 'tag-item';
+                div.innerHTML = `<span>${tag.name}</span>`;
+                div.addEventListener('click', () => {
+                    if (state.selectedPhotos.length > 0) {
+                        state.selectedPhotos.forEach(photoId => {
+                            const photo = state.photos.find(p => p.id === photoId);
+                            if (photo && !photo.tags.includes(tag.id)) {
+                                photo.tags.push(tag.id);
+                            }
+                        });
+                        renderGallery();
+                    }
+                });
+                tagList.appendChild(div);
+            });
+        }
+
+        function updateFilterTags() {
+            const select = document.getElementById('filterTag');
+            const current = select.value;
+            select.innerHTML = '<option value="">All Tags</option>';
+            
+            state.tags.forEach(tag => {
+                const option = document.createElement('option');
+                option.value = tag.id;
+                option.textContent = tag.name;
+                select.appendChild(option);
+            });
+            
+            select.value = current;
+        }
+
+        // Gallery Rendering
+        function renderGallery() {
+            const gallery = document.getElementById('photoGallery');
+            gallery.innerHTML = '';
+            gallery.classList.add('active');
+            
+            let photosToShow = state.kept;
+            
+            // Show message if no photos have been kept yet
+            if (photosToShow.length === 0) {
+                gallery.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; color: var(--text-light);">
+                        <h2 style="margin-bottom: 1rem; color: var(--text-light);">No Photos Yet</h2>
+                        <p>Go back to Phase 1 and mark some photos as "Keep"</p>
+                        <p style="margin-top: 0.5rem;">You have ${state.photos.length} total photos loaded, ${state.kept.length} kept, ${state.discarded.length} discarded</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Filter by album
+            if (state.currentAlbum !== 'all') {
+                const album = state.albums.find(a => a.id === state.currentAlbum);
+                if (album) {
+                    photosToShow = photosToShow.filter(p => album.photos.includes(p.id));
+                }
+            }
+            
+            // Filter by rating
+            if (state.filters.rating) {
+                const minRating = parseInt(state.filters.rating);
+                photosToShow = photosToShow.filter(p => p.rating >= minRating);
+            }
+            
+            // Filter by tag
+            if (state.filters.tag) {
+                const tagId = parseInt(state.filters.tag);
+                photosToShow = photosToShow.filter(p => p.tags.includes(tagId));
+            }
+            
+            // Check if filters eliminated all photos
+            if (photosToShow.length === 0) {
+                gallery.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; color: var(--text-light);">
+                        <h2 style="margin-bottom: 1rem; color: var(--text-light);">No Photos Match Filters</h2>
+                        <p>You have ${state.kept.length} kept photos total</p>
+                        <p style="margin-top: 0.5rem;">Try clearing filters or selecting different options</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            photosToShow.forEach(photo => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                if (state.selectedPhotos.includes(photo.id)) {
+                    item.classList.add('selected');
+                }
+                
+                const img = document.createElement('img');
+                img.src = photo.url;
+                img.alt = photo.name;
+                
+                const info = document.createElement('div');
+                info.className = 'gallery-item-info';
+                
+                const name = document.createElement('div');
+                name.className = 'gallery-item-name';
+                name.textContent = photo.name;
+                
+                const tags = document.createElement('div');
+                tags.className = 'gallery-item-tags';
+                photo.tags.forEach(tagId => {
+                    const tag = state.tags.find(t => t.id === tagId);
+                    if (tag) {
+                        const span = document.createElement('span');
+                        span.className = `tag ${tag.type}`;
+                        span.textContent = tag.name;
+                        tags.appendChild(span);
+                    }
+                });
+                
+                info.appendChild(name);
+                info.appendChild(tags);
+                item.appendChild(img);
+                item.appendChild(info);
+                
+                item.addEventListener('click', () => {
+                    if (state.selectedPhotos.includes(photo.id)) {
+                        state.selectedPhotos = state.selectedPhotos.filter(id => id !== photo.id);
+                        item.classList.remove('selected');
+                    } else {
+                        state.selectedPhotos.push(photo.id);
+                        item.classList.add('selected');
+                    }
+                    updateBulkButtons();
+                });
+                
+                gallery.appendChild(item);
+            });
+        }
+
+        // Filters
+        document.getElementById('filterRating').addEventListener('change', (e) => {
+            state.filters.rating = e.target.value;
+            renderGallery();
+        });
+
+        document.getElementById('filterTag').addEventListener('change', (e) => {
+            state.filters.tag = e.target.value;
+            renderGallery();
+        });
+
+        // Select All/Deselect All
+        document.getElementById('selectAllBtn').addEventListener('click', () => {
+            state.selectedPhotos = state.kept.map(p => p.id);
+            renderGallery();
+            updateBulkButtons();
+        });
+
+        document.getElementById('deselectAllBtn').addEventListener('click', () => {
+            state.selectedPhotos = [];
+            renderGallery();
+            updateBulkButtons();
+        });
+
+        function updateBulkButtons() {
+            const hasSelection = state.selectedPhotos.length > 0;
+            document.getElementById('bulkRenameBtn').disabled = !hasSelection;
+            document.getElementById('bulkTagBtn').disabled = !hasSelection;
+        }
+
+        // Batch Rename
+        document.getElementById('bulkRenameBtn').addEventListener('click', () => {
+            document.getElementById('renameCount').textContent = state.selectedPhotos.length;
+            document.getElementById('renamePattern').value = '';
+            document.getElementById('renameModal').classList.add('active');
+        });
+
+        document.getElementById('applyRenameBtn').addEventListener('click', () => {
+            const pattern = document.getElementById('renamePattern').value.trim();
+            if (!pattern) {
+                alert('Please enter a naming pattern');
+                return;
+            }
+            
+            let renamed = 0;
+            state.selectedPhotos.forEach((photoId, index) => {
+                // Find photo in both arrays since they reference the same objects
+                const photo = state.kept.find(p => p.id === photoId);
+                if (photo) {
+                    const num = String(index + 1).padStart(3, '0');
+                    const ext = photo.originalName.split('.').pop();
+                    photo.name = `${pattern} ${num}.${ext}`;
+                    renamed++;
+                }
+            });
+            
+            if (renamed > 0) {
+                renderGallery();
+                document.getElementById('renameModal').classList.remove('active');
+                
+                // Show success message
+                const btn = document.getElementById('bulkRenameBtn');
+                const originalText = btn.textContent;
+                btn.textContent = `✓ ${renamed} Renamed!`;
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            } else {
+                alert('No photos were renamed. Make sure photos are selected.');
+            }
+        });
+
+        document.getElementById('cancelRenameBtn').addEventListener('click', () => {
+            document.getElementById('renameModal').classList.remove('active');
+        });
+
+        // Bulk Tag
+        document.getElementById('bulkTagBtn').addEventListener('click', () => {
+            document.getElementById('bulkTagCount').textContent = state.selectedPhotos.length;
+            const container = document.getElementById('bulkTagCheckboxes');
+            container.innerHTML = '';
+            
+            if (state.tags.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-light);">No tags created yet. Create tags first.</p>';
+            } else {
+                state.tags.forEach(tag => {
+                    const label = document.createElement('label');
+                    label.style.display = 'block';
+                    label.style.marginBottom = '0.5rem';
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = tag.id;
+                    checkbox.style.marginRight = '0.5rem';
+                    
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(tag.name));
+                    container.appendChild(label);
+                });
+            }
+            
+            document.getElementById('bulkTagModal').classList.add('active');
+        });
+
+        document.getElementById('applyBulkTagBtn').addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('#bulkTagCheckboxes input:checked');
+            const tagIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+            
+            if (tagIds.length === 0) {
+                alert('Please select at least one tag');
+                return;
+            }
+            
+            let tagged = 0;
+            state.selectedPhotos.forEach(photoId => {
+                const photo = state.kept.find(p => p.id === photoId);
+                if (photo) {
+                    tagIds.forEach(tagId => {
+                        if (!photo.tags.includes(tagId)) {
+                            photo.tags.push(tagId);
+                        }
+                    });
+                    tagged++;
+                }
+            });
+            
+            if (tagged > 0) {
+                renderGallery();
+                document.getElementById('bulkTagModal').classList.remove('active');
+                
+                // Show success message
+                const btn = document.getElementById('bulkTagBtn');
+                const originalText = btn.textContent;
+                btn.textContent = `✓ ${tagged} Tagged!`;
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            }
+        });
+
+        document.getElementById('cancelBulkTagBtn').addEventListener('click', () => {
+            document.getElementById('bulkTagModal').classList.remove('active');
+        });
+
+        // Save/Load Progress
+        document.getElementById('saveProgressBtn').addEventListener('click', () => {
+            const data = {
+                photos: state.photos,
+                albums: state.albums,
+                tags: state.tags,
+                version: '1.0'
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'photo-organizer-data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('Progress saved! Keep this file to continue later.');
+        });
+
+        document.getElementById('loadProgressBtn').addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        state.photos = data.photos;
+                        state.albums = data.albums;
+                        state.tags = data.tags;
+                        state.kept = state.photos.filter(p => p.status === 'kept');
+                        state.discarded = state.photos.filter(p => p.status === 'discarded');
+                        
+                        initializeViewing();
+                        renderAlbums();
+                        renderTags();
+                        updateFilterTags();
+                        alert('Progress loaded successfully!');
+                    } catch (err) {
+                        alert('Error loading file. Please check the file format.');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        });
+
+        // Export Data
+        document.getElementById('exportDataBtn').addEventListener('click', () => {
+            const exportData = {
+                keptPhotos: state.kept.map(p => ({
+                    originalName: p.originalName,
+                    newName: p.name,
+                    rating: p.rating,
+                    albums: p.albums.map(id => state.albums.find(a => a.id === id)?.name),
+                    tags: p.tags.map(id => state.tags.find(t => t.id === id)?.name)
+                })),
+                albums: state.albums.map(a => ({
+                    name: a.name,
+                    photoCount: a.photos.length
+                })),
+                tags: state.tags.map(t => ({
+                    name: t.name,
+                    type: t.type
+                })),
+                stats: {
+                    total: state.photos.length,
+                    kept: state.kept.length,
+                    discarded: state.discarded.length
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'photo-organization-export.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('Organization plan exported!\n\nThis file shows which photos to keep, their ratings, new names, albums, and tags.\n\nOpen it in a text editor to see your plan.\n\nReminder: Your actual photo files are unchanged. You would need to manually move/rename files to match this plan.');
+        });
+
+        // Download Organized Photos
+        document.getElementById('downloadOrganizedBtn').addEventListener('click', async () => {
+            if (state.kept.length === 0) {
+                alert('No photos to organize. Mark some photos as "Keep" in Phase 1 first.');
+                return;
+            }
+
+            const btn = document.getElementById('downloadOrganizedBtn');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Creating ZIP file...';
+
+            try {
+                const zip = new JSZip();
+
+                // Create README
+                let readme = `ORGANIZED PHOTOS\n`;
+                readme += `================\n\n`;
+                readme += `This ZIP contains ${state.kept.length} photos organized into folders.\n\n`;
+                readme += `ALBUMS:\n`;
+                
+                if (state.albums.length === 0) {
+                    readme += `- All Photos (${state.kept.length} photos)\n`;
+                } else {
+                    state.albums.forEach(album => {
+                        const photoCount = state.kept.filter(p => p.albums.includes(album.id)).length;
+                        readme += `- ${album.name} (${photoCount} photos)\n`;
+                    });
+                    const unorganized = state.kept.filter(p => p.albums.length === 0).length;
+                    if (unorganized > 0) {
+                        readme += `- Unorganized (${unorganized} photos)\n`;
+                    }
+                }
+
+                readme += `\nINSTRUCTIONS:\n`;
+                readme += `1. Extract this ZIP file\n`;
+                readme += `2. You'll see folders for each album\n`;
+                readme += `3. Photos are renamed and organized\n`;
+                readme += `4. Use these organized photos however you like\n`;
+                readme += `5. Your original photos are unchanged\n\n`;
+                readme += `Generated on: ${new Date().toLocaleDateString()}\n`;
+
+                zip.file('README.txt', readme);
+
+                // If no albums, put everything in "All Photos" folder
+                if (state.albums.length === 0) {
+                    const allPhotosFolder = zip.folder('All Photos');
+                    
+                    for (let i = 0; i < state.kept.length; i++) {
+                        const photo = state.kept[i];
+                        btn.textContent = `Processing ${i + 1}/${state.kept.length}...`;
+                        
+                        // Convert base64 to blob
+                        const response = await fetch(photo.url);
+                        const blob = await response.blob();
+                        
+                        allPhotosFolder.file(photo.name, blob);
+                    }
+                } else {
+                    // Create folders for each album
+                    for (const album of state.albums) {
+                        const albumFolder = zip.folder(album.name);
+                        const albumPhotos = state.kept.filter(p => p.albums.includes(album.id));
+                        
+                        for (let i = 0; i < albumPhotos.length; i++) {
+                            const photo = albumPhotos[i];
+                            btn.textContent = `Processing ${album.name} ${i + 1}/${albumPhotos.length}...`;
+                            
+                            const response = await fetch(photo.url);
+                            const blob = await response.blob();
+                            
+                            albumFolder.file(photo.name, blob);
+                        }
+                    }
+
+                    // Create "Unorganized" folder for photos not in any album
+                    const unorganized = state.kept.filter(p => p.albums.length === 0);
+                    if (unorganized.length > 0) {
+                        const unorganizedFolder = zip.folder('Unorganized');
+                        
+                        for (let i = 0; i < unorganized.length; i++) {
+                            const photo = unorganized[i];
+                            btn.textContent = `Processing Unorganized ${i + 1}/${unorganized.length}...`;
+                            
+                            const response = await fetch(photo.url);
+                            const blob = await response.blob();
+                            
+                            unorganizedFolder.file(photo.name, blob);
+                        }
+                    }
+                }
+
+                // Generate and download ZIP
+                btn.textContent = 'Creating ZIP file...';
+                const content = await zip.generateAsync({
+                    type: 'blob',
+                    compression: 'DEFLATE',
+                    compressionOptions: { level: 6 }
+                }, (metadata) => {
+                    const percent = Math.round(metadata.percent);
+                    btn.textContent = `Zipping... ${percent}%`;
+                });
+
+                // Download
+                saveAs(content, 'organized-photos.zip');
+                
+                btn.textContent = '✓ Downloaded!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }, 3000);
+
+                alert('ZIP file downloaded!\n\nExtract the ZIP to get your organized photos with folders and new names.\n\nYour original photos are unchanged - this is a new organized copy.');
+
+            } catch (error) {
+                console.error('Error creating ZIP:', error);
+                alert('Error creating ZIP file. This might happen if you have too many photos. Try organizing fewer photos at a time.');
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
