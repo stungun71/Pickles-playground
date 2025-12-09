@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pickle's Playground</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Anton', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Header */
+        header {
+            background: #0a0a0a;
+            padding: 3rem 2rem;
+            text-align: center;
+            border-bottom: 2px solid #333;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 0.5rem;
+            color: #f5f5f5;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            font-weight: 300;
+            color: #b0b0b0;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 4rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .intro p {
+            font-size: 1.1rem;
+            color: #b0b0b0;
+            margin-bottom: 1rem;
+        }
+
+        /* Apps Grid */
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .app-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .app-card:hover {
+            transform: translateY(-5px);
+            border-color: #555;
+            box-shadow: 0 10px 30px rgba(255,255,255,0.1);
+        }
+
+        .app-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #f5f5f5;
+        }
+
+        .app-card p {
+            color: #b0b0b0;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .app-status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: #2a2a2a;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            color: #888;
+        }
+
+        .app-status.ready {
+            background: #1a3a1a;
+            color: #66ff66;
+        }
+
+        .download-btn {
+            display: inline-block;
+            width: 100%;
+            padding: 1rem;
+            background: #f5f5f5;
+            color: #0a0a0a;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .download-btn:hover {
+            background: #fff;
+            transform: scale(1.02);
+        }
+
+        .download-btn.disabled {
+            background: #2a2a2a;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .download-btn.disabled:hover {
+            transform: none;
+        }
+
+        /* Feedback Section */
+        .feedback-section {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 3rem 2rem;
+            background: #1a1a1a;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+
+        .feedback-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .feedback-section p {
+            color: #b0b0b0;
+            margin-bottom: 1.5rem;
+        }
+
+        .feedback-contact {
+            font-size: 1.2rem;
+            color: #f5f5f5;
+        }
+
+        .feedback-contact a {
+            color: #f5f5f5;
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            border-top: 1px solid #333;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Pickle's Playground</h1>
+        <p>Tools I built to make life easier</p>
+    </header>
+
+    <div class="container">
+        <div class="intro">
+            <p>Hey! These are some apps I've been working on for friends and family. They're all single-file HTML apps that work offline - just download and open in your browser. No installation, no cloud, no tracking.</p>
+            <p>If something breaks or you have ideas for improvements, let me know!</p>
+        </div>
+
+        <div class="apps-grid">
+            <!-- Photo Organizer -->
+            <div class="app-card">
+                <span class="app-status ready">Ready</span>
+                <h3>Photo Organizer</h3>
+                <p>Sort and organize your photos into folders. Rate them, tag them, and export them as a nice clean collection.</p>
+                <a href="photo-organizer.html" download class="download-btn">Download</a>
+            </div>
+
+            <!-- Coloring Page Creator -->
+            <div class="app-card">
+                <span class="app-status ready">Ready</span>
+                <h3>Coloring Page Creator</h3>
+                <p>Turn any photo into a coloring page. Perfect for making custom coloring books or fun activities.</p>
+                <a href="coloring-page-creator.html" download class="download-btn">Download</a>
+            </div>
+
+            <!-- Recipe Keeper -->
+            <div class="app-card">
+                <span class="app-status">Coming Soon</span>
+                <h3>Recipe Keeper</h3>
+                <p>Scan recipe cards and keep both the photo and a clean, jam-free text version. OCR built right in.</p>
+                <a href="#" class="download-btn disabled">Coming Soon</a>
+            </div>
+
+            <!-- Crossword Puzzle Creator -->
+            <div class="app-card">
+                <span class="app-status">Coming Soon</span>
+                <h3>Crossword Puzzle Creator</h3>
+                <p>Generate crossword puzzles or customize your own. Great for teachers, puzzle lovers, or just for fun.</p>
+                <a href="#" class="download-btn disabled">Coming Soon</a>
+            </div>
+
+            <!-- Word Search Creator -->
+            <div class="app-card">
+                <span class="app-status">Coming Soon</span>
+                <h3>Word Search Creator</h3>
+                <p>Make custom word search puzzles. Generate them automatically or upload your own word lists.</p>
+                <a href="#" class="download-btn disabled">Coming Soon</a>
+            </div>
+
+            <!-- Seamless Pattern Mixer -->
+            <div class="app-card">
+                <span class="app-status">Coming Soon</span>
+                <h3>Seamless Pattern Mixer</h3>
+                <p>Create repeating patterns for backgrounds, fabric designs, or whatever you need. Mix and match elements.</p>
+                <a href="#" class="download-btn disabled">Coming Soon</a>
+            </div>
+
+            <!-- Daily Planner -->
+            <div class="app-card">
+                <span class="app-status">Coming Soon</span>
+                <h3>Daily Planner</h3>
+                <p>A simple, offline daily planner to help you stay organized. No accounts, no sync, just planning.</p>
+                <a href="#" class="download-btn disabled">Coming Soon</a>
+            </div>
+        </div>
+
+        <div class="feedback-section">
+            <h2>Found a Bug?</h2>
+            <p>If something's not working right or you have suggestions, I want to hear about it!</p>
+            <p class="feedback-contact">
+                Email me at: <a href="mailto:your-email@example.com">your-email@example.com</a><br>
+                Or just text me if you have my number!
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Made with ❤️ by Pickle | All apps work offline | No tracking, no cloud, no BS</p>
+    </footer>
+</body>
+</html>
