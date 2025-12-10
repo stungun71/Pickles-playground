@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Search Maker</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f7;
+            --surface: #ffffff;
+            --border: #e0ddd8;
+            --text: #2c2c2c;
+            --text-muted: #6b6b6b;
+            --accent: #4a7c59;
+            --accent-hover: #3d6a4a;
+            --highlight: #fff3cd;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        
+        .controls {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .control-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        label {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        select, input, textarea {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+        }
+        
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+        }
+        
+        .checkbox-group label {
+            font-weight: 400;
+            color: var(--text);
+            cursor: pointer;
+        }
+        
+        .btn {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 0.85rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+        
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg);
+        }
+        
+        .button-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        /* Puzzle Display */
+        .puzzles-container {
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+        }
+        
+        .puzzle-wrapper {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            page-break-after: always;
+        }
+        
+        .puzzle-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .puzzle-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .puzzle-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        .puzzle-content {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 2rem;
+            align-items: start;
+        }
+        
+        @media (max-width: 800px) {
+            .puzzle-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .grid-container {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .puzzle-grid {
+            display: inline-grid;
+            gap: 0;
+            font-family: 'Space Mono', monospace;
+            border: 2px solid var(--text);
+        }
+        
+        .puzzle-grid.large-print {
+            font-size: 1.5rem;
+        }
+        
+        .puzzle-grid.regular-print {
+            font-size: 1.1rem;
+        }
+        
+        .grid-cell {
+            width: 2em;
+            height: 2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+        
+        .grid-cell.highlighted {
+            background: var(--highlight);
+        }
+        
+        .word-list {
+            min-width: 180px;
+        }
+        
+        .word-list h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        .word-list ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        
+        .word-list li {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            padding: 0.25rem 0;
+        }
+        
+        .word-list.large-print li {
+            font-size: 1.15rem;
+        }
+        
+        .word-list li.found {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+        
+        /* Answer Key */
+        .answer-key {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px dashed var(--border);
+        }
+        
+        .answer-key h3 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+        
+        .answer-key p {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+        
+        /* Status Messages */
+        .status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        
+        .status.error {
+            background: #fee;
+            color: #c00;
+            border: 1px solid #fcc;
+        }
+        
+        .status.success {
+            background: #efe;
+            color: #060;
+            border: 1px solid #cfc;
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .controls, .button-row, .status, header, footer {
+                display: none !important;
+            }
+            
+            .container {
+                padding: 0;
+                max-width: none;
+            }
+            
+            .puzzle-wrapper {
+                border: none;
+                box-shadow: none;
+                padding: 1rem;
+                page-break-after: always;
+                page-break-inside: avoid;
+            }
+            
+            .puzzle-wrapper:last-child {
+                page-break-after: auto;
+            }
+            
+            .grid-cell {
+                border-color: #999;
+            }
+            
+            .puzzle-grid {
+                border-color: #333;
+            }
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        .theme-preview {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+        
+        /* Book cover page */
+        .book-cover {
+            text-align: center;
+            padding: 4rem 2rem;
+            page-break-after: always;
+        }
+        
+        .book-cover h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .book-cover .theme-name {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 2rem;
+        }
+        
+        .book-cover .puzzle-count {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Word Search Maker</h1>
+            <p class="subtitle">Create printable puzzles for adults — with large print option</p>
+        </header>
+        
+        <div class="controls">
+            <div class="section-title">Word Source</div>
+            <div class="control-row">
+                <div class="control-group">
+                    <label for="wordSource">Choose Words From</label>
+                    <select id="wordSource">
+                        <option value="custom">Custom Words</option>
+                        <option value="wine">🍷 Wine & Spirits</option>
+                        <option value="travel">✈️ Travel & Adventure</option>
+                        <option value="movies">🎬 Classic Movies</option>
+                        <option value="literature">📚 Literature</option>
+                        <option value="music">🎵 Music & Artists</option>
+                        <option value="cooking">👨‍🍳 Cooking & Cuisine</option>
+                        <option value="nature">🌿 Nature & Garden</option>
+                        <option value="history">🏛️ History</option>
+                        <option value="science">🔬 Science</option>
+                        <option value="art">🎨 Art & Artists</option>
+                        <option value="mythology">⚡ Mythology</option>
+                        <option value="space">🚀 Space & Astronomy</option>
+                    </select>
+                    <p class="theme-preview" id="themePreview"></p>
+                </div>
+            </div>
+            
+            <div class="control-group" id="customWordsGroup">
+                <label for="customWords">Enter Your Words (one per line, 3-15 letters each)</label>
+                <textarea id="customWords" placeholder="SERENITY
+ADVENTURE
+TRANQUIL
+WANDERLUST
+HARMONY"></textarea>
+            </div>
+            
+            <div class="section-title" style="margin-top: 1.5rem;">Puzzle Settings</div>
+            <div class="control-row">
+                <div class="control-group">
+                    <label for="gridSize">Grid Size</label>
+                    <select id="gridSize">
+                        <option value="12">12 × 12 (Easy)</option>
+                        <option value="15" selected>15 × 15 (Medium)</option>
+                        <option value="18">18 × 18 (Challenging)</option>
+                        <option value="20">20 × 20 (Hard)</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="wordsPerPuzzle">Words Per Puzzle</label>
+                    <select id="wordsPerPuzzle">
+                        <option value="8">8 words</option>
+                        <option value="10">10 words</option>
+                        <option value="12" selected>12 words</option>
+                        <option value="15">15 words</option>
+                        <option value="18">18 words</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="puzzleCount">Number of Puzzles</label>
+                    <select id="puzzleCount">
+                        <option value="1">1 puzzle</option>
+                        <option value="3">3 puzzles</option>
+                        <option value="5">5 puzzles</option>
+                        <option value="10">10 puzzles (mini book)</option>
+                        <option value="20">20 puzzles (book)</option>
+                        <option value="30">30 puzzles (large book)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="control-row">
+                <div class="control-group">
+                    <label for="puzzleTitle">Puzzle Title (optional)</label>
+                    <input type="text" id="puzzleTitle" placeholder="My Word Search">
+                </div>
+            </div>
+            
+            <div class="section-title" style="margin-top: 1.5rem;">Display Options</div>
+            <div class="control-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="largePrint" checked>
+                    <label for="largePrint">Large Print (easier to read)</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="showAnswers">
+                    <label for="showAnswers">Include Answer Key</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="allowBackwards" checked>
+                    <label for="allowBackwards">Allow Backwards Words</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="allowDiagonal" checked>
+                    <label for="allowDiagonal">Allow Diagonal Words</label>
+                </div>
+            </div>
+            
+            <div class="button-row" style="margin-top: 1.5rem;">
+                <button class="btn btn-primary" onclick="generatePuzzles()">Generate Puzzles</button>
+                <button class="btn btn-secondary" onclick="window.print()">Print / Save PDF</button>
+            </div>
+        </div>
+        
+        <div id="status"></div>
+        
+        <div class="puzzles-container" id="puzzlesContainer"></div>
+    </div>
+    
+    <footer>
+        All processing happens in your browser. Your files never leave your computer.
+    </footer>
+
+    <script>
+        // Theme word lists
+        const themes = {
+            wine: {
+                name: "Wine & Spirits",
+                words: ["CABERNET", "MERLOT", "CHARDONNAY", "PINOT", "RIESLING", "SHIRAZ", "VINTAGE", "SOMMELIER", "DECANTER", "BOUQUET", "TANNINS", "BORDEAUX", "BURGUNDY", "CHAMPAGNE", "PROSECCO", "COGNAC", "BOURBON", "WHISKEY", "BRANDY", "APERITIF", "TERROIR", "CUVEE", "CORKAGE", "VINEYARD", "HARVEST", "BARREL", "CELLAR", "AROMA", "FINISH", "BLEND"]
+            },
+            travel: {
+                name: "Travel & Adventure",
+                words: ["WANDERLUST", "PASSPORT", "JOURNEY", "ADVENTURE", "DESTINATION", "VOYAGE", "EXPEDITION", "EXPLORE", "NOMAD", "SAFARI", "CRUISE", "EXCURSION", "RETREAT", "ODYSSEY", "SCENIC", "TROPICS", "ALPINE", "COASTAL", "HERITAGE", "CULTURE", "SOUVENIR", "ITINERARY", "CONCIERGE", "RESORT", "HOSTEL", "BACKPACK", "RAILWAY", "AIRPORT", "CUSTOMS", "VISTA"]
+            },
+            movies: {
+                name: "Classic Movies",
+                words: ["CASABLANCA", "CITIZEN", "GODFATHER", "VERTIGO", "PSYCHO", "CHINATOWN", "AMADEUS", "SPARTACUS", "PATTON", "RAGING", "GOODFELLAS", "PULP", "SCHINDLER", "FORREST", "TITANIC", "GLADIATOR", "BRAVEHEART", "DEPARTED", "INCEPTION", "INTERSTELLAR", "SCREENPLAY", "DIRECTOR", "CINEMATOGRAPHY", "MONTAGE", "DIALOGUE", "PREMIERE", "SEQUEL", "TRILOGY", "NOIR", "SUSPENSE"]
+            },
+            literature: {
+                name: "Literature",
+                words: ["NOVEL", "POETRY", "PROSE", "METAPHOR", "ALLEGORY", "NARRATIVE", "PROTAGONIST", "EPILOGUE", "PROLOGUE", "CHAPTER", "VERSE", "SONNET", "MEMOIR", "BIOGRAPHY", "FICTION", "RHETORIC", "SATIRE", "TRAGEDY", "COMEDY", "DRAMA", "MANUSCRIPT", "ANTHOLOGY", "BIBLIOGRAPHY", "SYNOPSIS", "THESIS", "GENRE", "LITERARY", "CLASSIC", "AUTHOR", "PUBLISH"]
+            },
+            music: {
+                name: "Music & Artists",
+                words: ["SYMPHONY", "MELODY", "HARMONY", "RHYTHM", "CRESCENDO", "ALLEGRO", "TEMPO", "ORCHESTRA", "CONCERTO", "SONATA", "BAROQUE", "CLASSICAL", "JAZZ", "BLUES", "ACOUSTIC", "ENSEMBLE", "VIRTUOSO", "COMPOSER", "MAESTRO", "BALLAD", "REFRAIN", "CHORUS", "PRELUDE", "OVERTURE", "NOCTURNE", "SERENADE", "ARIA", "OPUS", "CADENCE", "DYNAMICS"]
+            },
+            cooking: {
+                name: "Cooking & Cuisine",
+                words: ["SAUTEE", "BRAISE", "JULIENNE", "FLAMBE", "BLANCH", "REDUCTION", "EMULSION", "MARINADE", "ROUX", "BEURRE", "CONSOMME", "TARTARE", "CARPACCIO", "RISOTTO", "GNOCCHI", "PAELLA", "TERRINE", "GANACHE", "SOUFFLE", "CREME", "UMAMI", "GASTRONOMY", "SOMMELIER", "CUISINE", "ENTREE", "APPETIZER", "GARNISH", "INFUSION", "POACH", "DEGLAZE"]
+            },
+            nature: {
+                name: "Nature & Garden",
+                words: ["PERENNIAL", "DECIDUOUS", "EVERGREEN", "BOTANICAL", "CULTIVAR", "HEIRLOOM", "COMPOST", "MULCH", "TOPIARY", "ESPALIER", "PERGOLA", "TRELLIS", "ARBOR", "GAZEBO", "MEADOW", "PRAIRIE", "CANOPY", "UNDERSTORY", "ECOSYSTEM", "WATERSHED", "MIGRATORY", "NOCTURNAL", "HABITAT", "BIOME", "ESTUARY", "WETLAND", "FOLIAGE", "BLOSSOM", "VERDANT", "PRISTINE"]
+            },
+            history: {
+                name: "History",
+                words: ["RENAISSANCE", "MEDIEVAL", "ANTIQUITY", "DYNASTY", "MONARCHY", "REPUBLIC", "EMPIRE", "COLONIAL", "REVOLUTION", "ENLIGHTENMENT", "INDUSTRIAL", "Victorian", "EDWARDIAN", "BYZANTINE", "OTTOMAN", "PHARAOH", "GLADIATOR", "SAMURAI", "KNIGHT", "CRUSADE", "TREATY", "ALLIANCE", "CONQUEST", "EXPEDITION", "ARTIFACT", "ARCHIVE", "CHRONICLE", "HERITAGE", "LEGACY", "EPOCH"]
+            },
+            science: {
+                name: "Science",
+                words: ["HYPOTHESIS", "THEOREM", "QUANTUM", "MOLECULE", "ELECTRON", "NEUTRON", "ISOTOPE", "CATALYST", "SYNTHESIS", "ENTROPY", "VELOCITY", "MOMENTUM", "GRAVITY", "PHOTON", "SPECTRUM", "WAVELENGTH", "FREQUENCY", "AMPLITUDE", "OSMOSIS", "MITOSIS", "GENOME", "CHROMOSOME", "PROTEIN", "ENZYME", "COMPOUND", "ELEMENT", "PERIODIC", "ATOMIC", "NUCLEAR", "FUSION"]
+            },
+            art: {
+                name: "Art & Artists",
+                words: ["IMPRESSIONISM", "CUBISM", "SURREALISM", "BAROQUE", "RENAISSANCE", "ABSTRACT", "PORTRAIT", "LANDSCAPE", "SCULPTURE", "FRESCO", "MOSAIC", "TEMPERA", "GOUACHE", "PALETTE", "CANVAS", "GALLERY", "MUSEUM", "CURATOR", "EXHIBIT", "COLLECTION", "PIGMENT", "MEDIUM", "TEXTURE", "COMPOSITION", "PERSPECTIVE", "CHIAROSCURO", "PATINA", "AESTHETIC", "AVANT", "MODERN"]
+            },
+            mythology: {
+                name: "Mythology",
+                words: ["OLYMPUS", "ZEUS", "ATHENA", "APOLLO", "POSEIDON", "HERMES", "HADES", "PHOENIX", "PEGASUS", "CENTAUR", "MINOTAUR", "CYCLOPS", "MEDUSA", "HYDRA", "CERBERUS", "ORACLE", "PROPHECY", "ODYSSEY", "TITAN", "NEMESIS", "ACHILLES", "TROJAN", "LABYRINTH", "ELYSIUM", "NECTAR", "AMBROSIA", "TRIDENT", "AEGIS", "PANTHEON", "OLYMPIAN"]
+            },
+            space: {
+                name: "Space & Astronomy",
+                words: ["GALAXY", "NEBULA", "QUASAR", "PULSAR", "COSMOS", "STELLAR", "LUNAR", "SOLAR", "ORBITAL", "ASTEROID", "COMET", "METEOR", "ECLIPSE", "EQUINOX", "SOLSTICE", "CELESTIAL", "CONSTELLATION", "SUPERNOVA", "BLACKHOLE", "WORMHOLE", "SATELLITE", "TELESCOPE", "OBSERVATORY", "ASTRONAUT", "GRAVITY", "VELOCITY", "LIGHT YEAR", "PARSEC", "COSMIC", "INFINITE"]
+            }
+        };
+        
+        // Update theme preview
+        document.getElementById('wordSource').addEventListener('change', function() {
+            const source = this.value;
+            const preview = document.getElementById('themePreview');
+            const customGroup = document.getElementById('customWordsGroup');
+            
+            if (source === 'custom') {
+                preview.textContent = '';
+                customGroup.style.display = 'flex';
+            } else {
+                const theme = themes[source];
+                preview.textContent = `Sample: ${theme.words.slice(0, 5).join(', ')}...`;
+                customGroup.style.display = 'none';
+            }
+        });
+        
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.innerHTML = `<div class="status ${type}">${message}</div>`;
+            if (type === 'success') {
+                setTimeout(() => status.innerHTML = '', 3000);
+            }
+        }
+        
+        function getWords() {
+            const source = document.getElementById('wordSource').value;
+            
+            if (source === 'custom') {
+                const text = document.getElementById('customWords').value;
+                return text.split('\n')
+                    .map(w => w.trim().toUpperCase().replace(/[^A-Z]/g, ''))
+                    .filter(w => w.length >= 3 && w.length <= 15);
+            } else {
+                return [...themes[source].words];
+            }
+        }
+        
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+        
+        function createEmptyGrid(size) {
+            return Array(size).fill(null).map(() => Array(size).fill(''));
+        }
+        
+        function getDirections(allowBackwards, allowDiagonal) {
+            let dirs = [
+                { dx: 1, dy: 0, name: 'right' },
+                { dx: 0, dy: 1, name: 'down' }
+            ];
+            
+            if (allowDiagonal) {
+                dirs.push({ dx: 1, dy: 1, name: 'diagonal-down' });
+                dirs.push({ dx: 1, dy: -1, name: 'diagonal-up' });
+            }
+            
+            if (allowBackwards) {
+                const backwards = dirs.map(d => ({ 
+                    dx: -d.dx, 
+                    dy: -d.dy, 
+                    name: d.name + '-reverse' 
+                }));
+                dirs = [...dirs, ...backwards];
+            }
+            
+            return dirs;
+        }
+        
+        function canPlaceWord(grid, word, startX, startY, dx, dy) {
+            const size = grid.length;
+            
+            for (let i = 0; i < word.length; i++) {
+                const x = startX + i * dx;
+                const y = startY + i * dy;
+                
+                if (x < 0 || x >= size || y < 0 || y >= size) return false;
+                if (grid[y][x] !== '' && grid[y][x] !== word[i]) return false;
+            }
+            
+            return true;
+        }
+        
+        function placeWord(grid, word, startX, startY, dx, dy) {
+            const positions = [];
+            for (let i = 0; i < word.length; i++) {
+                const x = startX + i * dx;
+                const y = startY + i * dy;
+                grid[y][x] = word[i];
+                positions.push({ x, y });
+            }
+            return positions;
+        }
+        
+        function generatePuzzle(words, gridSize, allowBackwards, allowDiagonal) {
+            const grid = createEmptyGrid(gridSize);
+            const directions = getDirections(allowBackwards, allowDiagonal);
+            const placedWords = [];
+            const wordPositions = {};
+            
+            // Try to place each word
+            for (const word of words) {
+                let placed = false;
+                const shuffledDirs = shuffleArray(directions);
+                
+                // Try random positions
+                for (let attempt = 0; attempt < 100 && !placed; attempt++) {
+                    const dir = shuffledDirs[attempt % shuffledDirs.length];
+                    const startX = Math.floor(Math.random() * gridSize);
+                    const startY = Math.floor(Math.random() * gridSize);
+                    
+                    if (canPlaceWord(grid, word, startX, startY, dir.dx, dir.dy)) {
+                        const positions = placeWord(grid, word, startX, startY, dir.dx, dir.dy);
+                        placedWords.push(word);
+                        wordPositions[word] = {
+                            start: { x: startX, y: startY },
+                            direction: dir.name,
+                            positions: positions
+                        };
+                        placed = true;
+                    }
+                }
+            }
+            
+            // Fill empty cells with random letters
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    if (grid[y][x] === '') {
+                        grid[y][x] = letters[Math.floor(Math.random() * letters.length)];
+                    }
+                }
+            }
+            
+            return { grid, placedWords, wordPositions };
+        }
+        
+        function renderPuzzle(puzzle, index, title, largePrint, showAnswers) {
+            const { grid, placedWords, wordPositions } = puzzle;
+            const gridSize = grid.length;
+            
+            let html = `
+                <div class="puzzle-wrapper">
+                    <div class="puzzle-header">
+                        <h2 class="puzzle-title">${title}</h2>
+                        <p class="puzzle-subtitle">Find all ${placedWords.length} words hidden in the grid</p>
+                    </div>
+                    <div class="puzzle-content">
+                        <div class="grid-container">
+                            <div class="puzzle-grid ${largePrint ? 'large-print' : 'regular-print'}" 
+                                 style="grid-template-columns: repeat(${gridSize}, 1fr);">
+            `;
+            
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    html += `<div class="grid-cell">${grid[y][x]}</div>`;
+                }
+            }
+            
+            html += `
+                            </div>
+                        </div>
+                        <div class="word-list ${largePrint ? 'large-print' : ''}">
+                            <h3>Words to Find</h3>
+                            <ul>
+            `;
+            
+            // Sort words alphabetically for the list
+            const sortedWords = [...placedWords].sort();
+            for (const word of sortedWords) {
+                html += `<li>${word}</li>`;
+            }
+            
+            html += `
+                            </ul>
+                        </div>
+                    </div>
+            `;
+            
+            if (showAnswers) {
+                html += `
+                    <div class="answer-key">
+                        <h3>Answer Key</h3>
+                        <p>
+                `;
+                
+                for (const word of sortedWords) {
+                    const pos = wordPositions[word];
+                    if (pos) {
+                        html += `${word}: Row ${pos.start.y + 1}, Col ${pos.start.x + 1} (${pos.direction}) · `;
+                    }
+                }
+                
+                html += `
+                        </p>
+                    </div>
+                `;
+            }
+            
+            html += `</div>`;
+            
+            return html;
+        }
+        
+        function generatePuzzles() {
+            const source = document.getElementById('wordSource').value;
+            const gridSize = parseInt(document.getElementById('gridSize').value);
+            const wordsPerPuzzle = parseInt(document.getElementById('wordsPerPuzzle').value);
+            const puzzleCount = parseInt(document.getElementById('puzzleCount').value);
+            const customTitle = document.getElementById('puzzleTitle').value;
+            const largePrint = document.getElementById('largePrint').checked;
+            const showAnswers = document.getElementById('showAnswers').checked;
+            const allowBackwards = document.getElementById('allowBackwards').checked;
+            const allowDiagonal = document.getElementById('allowDiagonal').checked;
+            
+            const allWords = getWords();
+            
+            if (allWords.length < wordsPerPuzzle) {
+                showStatus(`Not enough words! You need at least ${wordsPerPuzzle} words, but only have ${allWords.length}.`, 'error');
+                return;
+            }
+            
+            const container = document.getElementById('puzzlesContainer');
+            let html = '';
+            
+            // Add book cover if making multiple puzzles
+            if (puzzleCount > 1) {
+                const themeName = source === 'custom' ? 'Custom' : themes[source].name;
+                html += `
+                    <div class="puzzle-wrapper book-cover">
+                        <h1>${customTitle || 'Word Search Collection'}</h1>
+                        <p class="theme-name">${themeName}</p>
+                        <p class="puzzle-count">${puzzleCount} Puzzles</p>
+                    </div>
+                `;
+            }
+            
+            // Generate each puzzle
+            for (let i = 0; i < puzzleCount; i++) {
+                // Select random words for this puzzle
+                const shuffled = shuffleArray(allWords);
+                const selectedWords = shuffled.slice(0, wordsPerPuzzle);
+                
+                // Generate the puzzle
+                const puzzle = generatePuzzle(selectedWords, gridSize, allowBackwards, allowDiagonal);
+                
+                if (puzzle.placedWords.length < wordsPerPuzzle * 0.7) {
+                    // If we couldn't place enough words, try again
+                    i--;
+                    continue;
+                }
+                
+                const title = customTitle || (source === 'custom' ? 'Word Search' : themes[source].name);
+                const displayTitle = puzzleCount > 1 ? `${title} #${i + 1}` : title;
+                
+                html += renderPuzzle(puzzle, i, displayTitle, largePrint, showAnswers);
+            }
+            
+            container.innerHTML = html;
+            showStatus(`Successfully generated ${puzzleCount} puzzle${puzzleCount > 1 ? 's' : ''}! Click "Print / Save PDF" to print or save.`, 'success');
+        }
+        
+        // Initialize
+        document.getElementById('wordSource').dispatchEvent(new Event('change'));
+    </script>
+</body>
+</html>
