@@ -117,34 +117,55 @@
             color: #ffaa33;
         }
 
-        .download-btn {
+        .btn-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .open-btn, .download-btn {
             display: inline-block;
-            width: 100%;
-            padding: 1rem;
-            background: #f5f5f5;
-            color: #0a0a0a;
+            padding: 0.85rem 1rem;
             text-align: center;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.95rem;
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
+            flex: 1;
         }
 
-        .download-btn:hover {
+        .open-btn {
+            background: #f5f5f5;
+            color: #0a0a0a;
+        }
+
+        .open-btn:hover {
             background: #fff;
             transform: scale(1.02);
         }
 
-        .download-btn.disabled {
-            background: #2a2a2a;
-            color: #666;
-            cursor: not-allowed;
+        .download-btn {
+            background: transparent;
+            color: #f5f5f5;
+            border: 1px solid #555;
         }
 
-        .download-btn.disabled:hover {
+        .download-btn:hover {
+            border-color: #f5f5f5;
+            transform: scale(1.02);
+        }
+
+        .open-btn.disabled, .download-btn.disabled {
+            background: #2a2a2a;
+            color: #666;
+            border-color: #2a2a2a;
+            cursor: not-allowed;
+            flex: 1;
+        }
+
+        .open-btn.disabled:hover, .download-btn.disabled:hover {
             transform: none;
         }
 
@@ -216,7 +237,10 @@
                 <span class="app-status featured">⭐ New</span>
                 <h3>Carpenter's Calculator</h3>
                 <p>Built for working carpenters. Handles board feet, stair stringers, rafter cuts, concrete, and more. Runs offline, no account needed.</p>
-                <a href="carpenter-calc.html" download class="download-btn">Download</a>
+                <div class="btn-row">
+                    <a href="carpenter-calc.html" class="open-btn">Open</a>
+                    <a href="carpenter-calc.html" download class="download-btn">Download</a>
+                </div>
             </div>
 
             <!-- Photo Organizer -->
@@ -224,7 +248,10 @@
                 <span class="app-status ready">Ready</span>
                 <h3>Photo Organizer</h3>
                 <p>Sort and organize your photos into folders. Rate them, tag them, and export them as a nice clean collection.</p>
-                <a href="photo-organizer.html" download class="download-btn">Download</a>
+                <div class="btn-row">
+                    <a href="photo-organizer.html" class="open-btn">Open</a>
+                    <a href="photo-organizer.html" download class="download-btn">Download</a>
+                </div>
             </div>
 
             <!-- Coloring Page Creator -->
@@ -232,7 +259,10 @@
                 <span class="app-status ready">Ready</span>
                 <h3>Coloring Page Creator</h3>
                 <p>Turn any photo into a coloring page. Perfect for making custom coloring books or fun activities.</p>
-                <a href="coloring-page-creator.html" download class="download-btn">Download</a>
+                <div class="btn-row">
+                    <a href="coloring-page-creator.html" class="open-btn">Open</a>
+                    <a href="coloring-page-creator.html" download class="download-btn">Download</a>
+                </div>
             </div>
 
             <!-- Word Search Creator -->
@@ -240,7 +270,10 @@
                 <span class="app-status ready">Ready</span>
                 <h3>Word Search Creator</h3>
                 <p>Make custom word search puzzles. Generate them automatically or upload your own word lists.</p>
-                <a href="word-search-maker.html" download class="download-btn">Download</a>
+                <div class="btn-row">
+                    <a href="word-search-maker.html" class="open-btn">Open</a>
+                    <a href="word-search-maker.html" download class="download-btn">Download</a>
+                </div>
             </div>
 
             <!-- Recipe Keeper -->
@@ -248,7 +281,9 @@
                 <span class="app-status">Coming Soon</span>
                 <h3>Recipe Keeper</h3>
                 <p>Scan recipe cards and keep both the photo and a clean, jam-free text version. OCR built right in.</p>
-                <a href="#" class="download-btn disabled">Coming Soon</a>
+                <div class="btn-row">
+                    <a href="#" class="open-btn disabled">Coming Soon</a>
+                </div>
             </div>
 
             <!-- Crossword Puzzle Creator -->
@@ -256,7 +291,9 @@
                 <span class="app-status">Coming Soon</span>
                 <h3>Crossword Puzzle Creator</h3>
                 <p>Generate crossword puzzles or customize your own. Great for teachers, puzzle lovers, or just for fun.</p>
-                <a href="#" class="download-btn disabled">Coming Soon</a>
+                <div class="btn-row">
+                    <a href="#" class="open-btn disabled">Coming Soon</a>
+                </div>
             </div>
 
             <!-- Seamless Pattern Mixer -->
@@ -264,7 +301,9 @@
                 <span class="app-status">Coming Soon</span>
                 <h3>Seamless Pattern Mixer</h3>
                 <p>Create repeating patterns for backgrounds, fabric designs, or whatever you need. Mix and match elements.</p>
-                <a href="#" class="download-btn disabled">Coming Soon</a>
+                <div class="btn-row">
+                    <a href="#" class="open-btn disabled">Coming Soon</a>
+                </div>
             </div>
 
             <!-- Daily Planner -->
@@ -272,7 +311,9 @@
                 <span class="app-status">Coming Soon</span>
                 <h3>Daily Planner</h3>
                 <p>A simple, offline daily planner to help you stay organized. No accounts, no sync, just planning.</p>
-                <a href="#" class="download-btn disabled">Coming Soon</a>
+                <div class="btn-row">
+                    <a href="#" class="open-btn disabled">Coming Soon</a>
+                </div>
             </div>
 
         </div>
