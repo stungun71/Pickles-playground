@@ -1,0 +1,894 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carpenter's Calculator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Source+Code+Pro:wght@400;600&family=Source+Sans+3:wght@400;600&display=swap');
+
+  :root {
+    --bg: #1a1a18;
+    --panel: #242420;
+    --border: #3a3a34;
+    --accent: #c8a84b;
+    --accent2: #8fb87a;
+    --text: #e8e4d8;
+    --muted: #888880;
+    --input-bg: #0e0e0c;
+    --result-bg: #0a0a08;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Sans 3', sans-serif;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  header {
+    text-align: center;
+    padding: 24px 0 28px;
+    border-bottom: 2px solid var(--accent);
+    margin-bottom: 28px;
+  }
+
+  header h1 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 2.2em;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 0.85em;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.85em;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 9px 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .tab:hover { color: var(--text); border-color: var(--muted); }
+
+  .tab.active {
+    background: var(--accent);
+    color: #1a1a18;
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+
+  .calculator {
+    display: none;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 28px;
+    max-width: 600px;
+  }
+
+  .calculator.active { display: block; }
+
+  .calc-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.1em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .calc-desc {
+    color: var(--muted);
+    font-size: 0.88em;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .field {
+    margin-bottom: 16px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.8em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  input, select {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Source Code Pro', monospace;
+    font-size: 1.1em;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+
+  input:focus, select:focus { border-color: var(--accent); }
+
+  select option { background: var(--panel); }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+
+  button.calc-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 13px;
+    background: var(--accent);
+    color: #1a1a18;
+    border: none;
+    font-family: 'Oswald', sans-serif;
+    font-size: 1em;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  button.calc-btn:hover { background: #d9bb6a; }
+
+  .result {
+    margin-top: 20px;
+    background: var(--result-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    padding: 18px 20px;
+    display: none;
+  }
+
+  .result.show { display: block; }
+
+  .result-label {
+    font-size: 0.75em;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .result-value {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 1.5em;
+    color: var(--accent2);
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .result-note {
+    font-size: 0.82em;
+    color: var(--muted);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 4px;
+  }
+
+  .result-item { }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  .warning {
+    color: #e8a060;
+    font-size: 0.82em;
+    margin-top: 8px;
+  }
+
+  @media (max-width: 480px) {
+    .row, .row-3 { grid-template-columns: 1fr; }
+    .result-grid { grid-template-columns: 1fr; }
+    header h1 { font-size: 1.6em; }
+    .calculator { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Carpenter's Calculator</h1>
+  <p>Field Math — No Internet Required</p>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showCalc('boardfeet', this)">Board Feet</div>
+  <div class="tab" onclick="showCalc('stairs', this)">Stair Stringers</div>
+  <div class="tab" onclick="showCalc('roofpitch', this)">Roof Pitch</div>
+  <div class="tab" onclick="showCalc('material', this)">Material Est.</div>
+  <div class="tab" onclick="showCalc('angles', this)">Miter Angles</div>
+  <div class="tab" onclick="showCalc('price', this)">Price Estimator</div>
+</div>
+
+<!-- BOARD FEET -->
+<div class="calculator active" id="calc-boardfeet">
+  <div class="calc-title">Board Feet Calculator</div>
+  <div class="calc-desc">Calculate board feet for lumber purchasing. Enter nominal dimensions and quantity.</div>
+
+  <div class="row">
+    <div class="field">
+      <label>Thickness (inches)</label>
+      <input type="number" id="bf-thick" placeholder="e.g. 1" step="0.25" min="0.25">
+    </div>
+    <div class="field">
+      <label>Width (inches)</label>
+      <input type="number" id="bf-width" placeholder="e.g. 6" step="0.5" min="0.5">
+    </div>
+  </div>
+  <div class="row">
+    <div class="field">
+      <label>Length (feet)</label>
+      <input type="number" id="bf-length" placeholder="e.g. 8" step="0.5" min="1">
+    </div>
+    <div class="field">
+      <label>Quantity (pieces)</label>
+      <input type="number" id="bf-qty" placeholder="e.g. 10" step="1" min="1" value="1">
+    </div>
+  </div>
+  <div class="field">
+    <label>Waste Factor (%)</label>
+    <input type="number" id="bf-waste" placeholder="e.g. 10" step="1" min="0" value="10">
+  </div>
+
+  <button class="calc-btn" onclick="calcBoardFeet()">Calculate</button>
+
+  <div class="result" id="result-boardfeet">
+    <div class="result-grid">
+      <div class="result-item">
+        <div class="result-label">Board Feet (net)</div>
+        <div class="result-value" id="bf-out-net">—</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">Board Feet (w/ waste)</div>
+        <div class="result-value" id="bf-out-waste">—</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">Total Pieces Needed</div>
+        <div class="result-value" id="bf-out-pieces">—</div>
+      </div>
+    </div>
+    <div class="result-note">For cost estimate, use the <strong style="color:var(--accent)">Price Estimator</strong> tab.</div>
+  </div>
+</div>
+
+<!-- STAIR STRINGERS -->
+<div class="calculator" id="calc-stairs">
+  <div class="calc-title">Stair Stringer Calculator</div>
+  <div class="calc-desc">Calculate rise, run, and number of steps. Code typically requires 7–7¾" max rise, 10" min run.</div>
+
+  <div class="row">
+    <div class="field">
+      <label>Total Rise (inches)</label>
+      <input type="number" id="st-rise" placeholder="e.g. 108" step="0.125">
+    </div>
+    <div class="field">
+      <label>Desired Rise per Step (in)</label>
+      <input type="number" id="st-riser" placeholder="e.g. 7" step="0.125" value="7">
+    </div>
+  </div>
+  <div class="field">
+    <label>Desired Run per Step (inches)</label>
+    <input type="number" id="st-run" placeholder="e.g. 10" step="0.25" value="10">
+  </div>
+
+  <button class="calc-btn" onclick="calcStairs()">Calculate</button>
+
+  <div class="result" id="result-stairs">
+    <div class="result-grid">
+      <div class="result-item">
+        <div class="result-label">Number of Steps</div>
+        <div class="result-value" id="st-out-steps">—</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">Actual Rise Each</div>
+        <div class="result-value" id="st-out-rise">—</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">Total Run (horizontal)</div>
+        <div class="result-value" id="st-out-totalrun">—</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">Stringer Length</div>
+        <div class="result-value" id="st-out-stringer">—</div>
+      </div>
+    </div>
+    <div class="result-note" id="st-out-note"></div>
+  </div>
+</div>
+
+<!-- ROOF PITCH -->
+<div class="calculator" id="calc-roofpitch">
+  <div class="calc-title">Roof Pitch Calculator</div>
+  <div class="calc-desc">Enter pitch and span to find rafter length, or enter known measurements to find pitch.</div>
+
+  <div class="field">
+    <label>Calculate From</label>
+    <select id="rp-mode" onchange="toggleRoofMode()">
+      <option value="pitch">Pitch + Span → Rafter Length</option>
+      <option value="measure">Rise + Run → Pitch</option>
+    </select>
+  </div>
+
+  <div id="rp-mode-pitch">
+    <div class="row">
+      <div class="field">
+        <label>Pitch (rise per 12" run)</label>
+        <input type="number" id="rp-pitch" placeholder="e.g. 6" step="0.5" min="1">
+      </div>
+      <div class="field">
+        <label>Building Span (feet)</label>
+        <input type="number" id="rp-span" placeholder="e.g. 24" step="0.5">
+      </div>
+    </div>
+    <div class="field">
+      <label>Overhang Each Side (inches)</label>
+      <input type="number" id="rp-overhang" placeholder="e.g. 18" step="1" value="18">
+    </div>
+  </div>
+
+  <div id="rp-mode-measure" style="display:none">
+    <div class="row">
+      <div class="field">
+        <label>Rise (inches)</label>
+        <input type="number" id="rp-rise" placeholder="e.g. 6" step="0.5">
+      </div>
+      <div class="field">
+        <label>Run (inches)</label>
+        <input type="number" id="rp-run-in" placeholder="e.g. 12" step="0.5">
+      </div>
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="calcRoof()">Calculate</button>
+
+  <div class="result" id="result-roofpitch">
+    <div class="result-grid">
+      <div class="result-item">
+        <div class="result-label" id="rp-label1">Rafter Length</div>
+        <div class="result-value" id="rp-out1">—</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label" id="rp-label2">Roof Angle</div>
+        <div class="result-value" id="rp-out2">—</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label" id="rp-label3">Pitch Ratio</div>
+        <div class="result-value" id="rp-out3">—</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">Multiplier</div>
+        <div class="result-value" id="rp-out4">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MATERIAL ESTIMATOR -->
+<div class="calculator" id="calc-material">
+  <div class="calc-title">Material Estimator</div>
+  <div class="calc-desc">Estimate sheets, linear feet, or square footage needed for a job with waste built in.</div>
+
+  <div class="field">
+    <label>Material Type</label>
+    <select id="mat-type" onchange="toggleMatType()">
+      <option value="sheet">Sheet Goods (plywood, drywall)</option>
+      <option value="linear">Linear Material (trim, decking boards)</option>
+      <option value="sqft">Square Footage (flooring, tile)</option>
+    </select>
+  </div>
+
+  <div id="mat-sheet">
+    <div class="row">
+      <div class="field">
+        <label>Area Width (feet)</label>
+        <input type="number" id="mat-area-w" placeholder="e.g. 12" step="0.5">
+      </div>
+      <div class="field">
+        <label>Area Height (feet)</label>
+        <input type="number" id="mat-area-h" placeholder="e.g. 9" step="0.5">
+      </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Sheet Width (feet)</label>
+        <input type="number" id="mat-sheet-w" value="4" step="0.5">
+      </div>
+      <div class="field">
+        <label>Sheet Height (feet)</label>
+        <input type="number" id="mat-sheet-h" value="8" step="0.5">
+      </div>
+    </div>
+  </div>
+
+  <div id="mat-linear" style="display:none">
+    <div class="row">
+      <div class="field">
+        <label>Total Linear Feet Needed</label>
+        <input type="number" id="mat-lin-needed" placeholder="e.g. 85" step="1">
+      </div>
+      <div class="field">
+        <label>Board Length Available (ft)</label>
+        <input type="number" id="mat-lin-length" placeholder="e.g. 16" step="1" value="16">
+      </div>
+    </div>
+  </div>
+
+  <div id="mat-sqft" style="display:none">
+    <div class="row">
+      <div class="field">
+        <label>Room Width (feet)</label>
+        <input type="number" id="mat-sqft-w" placeholder="e.g. 12" step="0.5">
+      </div>
+      <div class="field">
+        <label>Room Length (feet)</label>
+        <input type="number" id="mat-sqft-l" placeholder="e.g. 15" step="0.5">
+      </div>
+    </div>
+    <div class="field">
+      <label>Material Sold In (sq ft per box/unit)</label>
+      <input type="number" id="mat-sqft-unit" placeholder="e.g. 20" step="0.5">
+    </div>
+  </div>
+
+  <div class="field" style="margin-top:4px">
+    <label>Waste Factor (%)</label>
+    <input type="number" id="mat-waste" placeholder="e.g. 10" step="1" value="10">
+  </div>
+
+  <button class="calc-btn" onclick="calcMaterial()">Calculate</button>
+
+  <div class="result" id="result-material">
+    <div class="result-grid">
+      <div class="result-item">
+        <div class="result-label" id="mat-label1">Square Footage</div>
+        <div class="result-value" id="mat-out1">—</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label" id="mat-label2">Units Needed</div>
+        <div class="result-value" id="mat-out2">—</div>
+      </div>
+    </div>
+    <div class="result-note" id="mat-out-note"></div>
+  </div>
+</div>
+
+<!-- MITER ANGLES -->
+<div class="calculator" id="calc-angles">
+  <div class="calc-title">Miter & Bevel Angles</div>
+  <div class="calc-desc">Find saw settings for common carpentry cuts. Enter corner angle for miter, or wall pitch for crown molding.</div>
+
+  <div class="field">
+    <label>Cut Type</label>
+    <select id="ang-type" onchange="toggleAngType()">
+      <option value="miter">Corner Miter (frames, boxes)</option>
+      <option value="crown">Crown Molding</option>
+      <option value="compound">Compound Miter (angled wall)</option>
+    </select>
+  </div>
+
+  <div id="ang-miter">
+    <div class="field">
+      <label>Corner Angle (degrees)</label>
+      <input type="number" id="ang-corner" placeholder="e.g. 90" step="0.5" value="90">
+    </div>
+  </div>
+
+  <div id="ang-crown" style="display:none">
+    <div class="row">
+      <div class="field">
+        <label>Crown Spring Angle</label>
+        <select id="ang-spring">
+          <option value="38">38° (common)</option>
+          <option value="45">45° (steep)</option>
+          <option value="52">52° (low slope)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Corner Angle (degrees)</label>
+        <input type="number" id="ang-crown-corner" placeholder="e.g. 90" step="0.5" value="90">
+      </div>
+    </div>
+  </div>
+
+  <div id="ang-compound" style="display:none">
+    <div class="row">
+      <div class="field">
+        <label>Corner Angle (degrees)</label>
+        <input type="number" id="ang-comp-corner" placeholder="e.g. 90" step="0.5" value="90">
+      </div>
+      <div class="field">
+        <label>Wall Slope (degrees)</label>
+        <input type="number" id="ang-comp-slope" placeholder="e.g. 15" step="0.5" value="0">
+      </div>
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="calcAngles()">Calculate Saw Settings</button>
+
+  <div class="result" id="result-angles">
+    <div class="result-grid">
+      <div class="result-item">
+        <div class="result-label">Miter Angle</div>
+        <div class="result-value" id="ang-out-miter">—</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">Bevel Angle</div>
+        <div class="result-value" id="ang-out-bevel">—</div>
+      </div>
+    </div>
+    <div class="result-note" id="ang-out-note"></div>
+  </div>
+</div>
+
+<!-- PRICE ESTIMATOR -->
+<div class="calculator" id="calc-price">
+  <div class="calc-title">Price Estimator</div>
+  <div class="calc-desc">Build a material list with quantities and unit prices. Add tax, labor, and markup to get a full job cost.</div>
+
+  <table style="width:100%;border-collapse:collapse;margin-bottom:12px;">
+    <thead>
+      <tr style="font-size:0.75em;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">
+        <th style="text-align:left;padding:6px 4px;width:35%">Description</th>
+        <th style="text-align:left;padding:6px 4px;width:12%">Qty</th>
+        <th style="text-align:left;padding:6px 4px;width:17%">Unit</th>
+        <th style="text-align:left;padding:6px 4px;width:14%">Unit Price</th>
+        <th style="text-align:right;padding:6px 4px;width:14%">Line Total</th>
+        <th style="width:8%"></th>
+      </tr>
+    </thead>
+    <tbody id="price-rows"></tbody>
+  </table>
+
+  <button class="calc-btn" onclick="addPriceRow()" style="background:var(--panel);color:var(--accent);border:1px solid var(--accent);margin-bottom:16px;">+ Add Item</button>
+
+  <hr class="divider">
+
+  <div class="row-3">
+    <div class="field">
+      <label>Sales Tax (%)</label>
+      <input type="number" id="pr-tax" placeholder="e.g. 10.1" step="0.1" min="0" oninput="updatePriceTotals()">
+    </div>
+    <div class="field">
+      <label>Labor / Other ($)</label>
+      <input type="number" id="pr-labor" placeholder="e.g. 500" step="10" min="0" oninput="updatePriceTotals()">
+    </div>
+    <div class="field">
+      <label>Markup (%)</label>
+      <input type="number" id="pr-markup" placeholder="e.g. 15" step="1" min="0" oninput="updatePriceTotals()">
+    </div>
+  </div>
+
+  <div class="result show" id="result-price">
+    <div class="result-grid">
+      <div class="result-item">
+        <div class="result-label">Materials Subtotal</div>
+        <div class="result-value" id="pr-out-materials">—</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">Tax</div>
+        <div class="result-value" id="pr-out-tax">—</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">Labor / Other</div>
+        <div class="result-value" id="pr-out-labor">—</div>
+      </div>
+      <div class="result-item">
+        <div class="result-label">Total (w/ Markup)</div>
+        <div class="result-value" id="pr-out-total" style="color:var(--accent)">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showCalc(id, el) {
+    document.querySelectorAll('.calculator').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('calc-' + id).classList.add('active');
+    el.classList.add('active');
+  }
+
+  function fmt(n, dec=2) { return isNaN(n) || !isFinite(n) ? '—' : n.toFixed(dec); }
+  function fmtIn(inches) {
+    const ft = Math.floor(inches/12);
+    const rem = inches % 12;
+    if (ft === 0) return rem.toFixed(3) + '"';
+    return ft + "' " + rem.toFixed(3) + '"';
+  }
+
+  // BOARD FEET
+  function calcBoardFeet() {
+    const t = parseFloat(document.getElementById('bf-thick').value);
+    const w = parseFloat(document.getElementById('bf-width').value);
+    const l = parseFloat(document.getElementById('bf-length').value);
+    const qty = parseFloat(document.getElementById('bf-qty').value) || 1;
+    const waste = parseFloat(document.getElementById('bf-waste').value) || 0;
+
+    if (!t || !w || !l) return;
+
+    const bfEach = (t * w * l) / 12;
+    const bfNet = bfEach * qty;
+    const bfWaste = bfNet * (1 + waste/100);
+    const piecesNeeded = Math.ceil(bfWaste / bfEach);
+
+    document.getElementById('bf-out-net').textContent = fmt(bfNet) + ' bf';
+    document.getElementById('bf-out-waste').textContent = fmt(bfWaste) + ' bf';
+    document.getElementById('bf-out-pieces').textContent = piecesNeeded + ' pcs';
+    document.getElementById('result-boardfeet').classList.add('show');
+  }
+
+  // PRICE ESTIMATOR
+  function addPriceRow() {
+    const tbody = document.getElementById('price-rows');
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><input type="text" class="pr-desc" placeholder="e.g. 2×6 framing lumber" style="width:100%;background:var(--input-bg);border:1px solid var(--border);color:var(--text);font-family:'Source Code Pro',monospace;font-size:0.95em;padding:7px 10px;outline:none;"></td>
+      <td><input type="number" class="pr-qty" placeholder="0" step="0.01" min="0" style="width:100%;background:var(--input-bg);border:1px solid var(--border);color:var(--text);font-family:'Source Code Pro',monospace;font-size:0.95em;padding:7px 10px;outline:none;" oninput="updatePriceTotals()"></td>
+      <td>
+        <select class="pr-unit" style="width:100%;background:var(--input-bg);border:1px solid var(--border);color:var(--text);font-family:'Source Code Pro',monospace;font-size:0.95em;padding:7px 10px;outline:none;">
+          <option value="bf">per bf</option>
+          <option value="lf">per lf</option>
+          <option value="sqft">per sq ft</option>
+          <option value="sheet">per sheet</option>
+          <option value="piece">per piece</option>
+          <option value="lb">per lb</option>
+          <option value="each">each</option>
+        </select>
+      </td>
+      <td><input type="number" class="pr-price" placeholder="0.00" step="0.01" min="0" style="width:100%;background:var(--input-bg);border:1px solid var(--border);color:var(--text);font-family:'Source Code Pro',monospace;font-size:0.95em;padding:7px 10px;outline:none;" oninput="updatePriceTotals()"></td>
+      <td style="text-align:right;font-family:'Source Code Pro',monospace;color:var(--accent2);padding:7px 4px;" class="pr-line-total">—</td>
+      <td style="text-align:center;padding:4px;"><button onclick="this.closest('tr').remove(); updatePriceTotals();" style="background:none;border:none;color:var(--muted);font-size:1.1em;cursor:pointer;padding:4px 8px;" title="Remove">✕</button></td>
+    `;
+    tbody.appendChild(row);
+    updatePriceTotals();
+  }
+
+  function updatePriceTotals() {
+    let subtotal = 0;
+    document.querySelectorAll('#price-rows tr').forEach(row => {
+      const qty = parseFloat(row.querySelector('.pr-qty').value) || 0;
+      const price = parseFloat(row.querySelector('.pr-price').value) || 0;
+      const lineTotal = qty * price;
+      const cell = row.querySelector('.pr-line-total');
+      cell.textContent = lineTotal > 0 ? '$' + fmt(lineTotal) : '—';
+      subtotal += lineTotal;
+    });
+    const tax = (parseFloat(document.getElementById('pr-tax').value) || 0) / 100;
+    const markup = (parseFloat(document.getElementById('pr-markup').value) || 0) / 100;
+    const labor = parseFloat(document.getElementById('pr-labor').value) || 0;
+    const taxAmt = subtotal * tax;
+    const markedUp = (subtotal + taxAmt + labor) * (1 + markup);
+    document.getElementById('pr-out-materials').textContent = subtotal > 0 ? '$' + fmt(subtotal) : '—';
+    document.getElementById('pr-out-tax').textContent = taxAmt > 0 ? '$' + fmt(taxAmt) : '—';
+    document.getElementById('pr-out-labor').textContent = labor > 0 ? '$' + fmt(labor) : '—';
+    document.getElementById('pr-out-total').textContent = markedUp > 0 ? '$' + fmt(markedUp) : '—';
+    if (subtotal > 0 || labor > 0) document.getElementById('result-price').classList.add('show');
+  }
+
+  // STAIRS
+  function calcStairs() {
+    const totalRise = parseFloat(document.getElementById('st-rise').value);
+    const desiredRiser = parseFloat(document.getElementById('st-riser').value) || 7;
+    const run = parseFloat(document.getElementById('st-run').value) || 10;
+
+    if (!totalRise) return;
+
+    const numSteps = Math.round(totalRise / desiredRiser);
+    const actualRiser = totalRise / numSteps;
+    const totalRun = run * numSteps;
+    const stringerLen = Math.sqrt(Math.pow(totalRise, 2) + Math.pow(totalRun, 2)) / 12;
+
+    document.getElementById('st-out-steps').textContent = numSteps;
+    document.getElementById('st-out-rise').textContent = fmt(actualRiser, 3) + '"';
+    document.getElementById('st-out-totalrun').textContent = fmt(totalRun / 12, 2) + "'";
+    document.getElementById('st-out-stringer').textContent = fmt(stringerLen, 2) + "'";
+
+    let note = '';
+    if (actualRiser > 7.75) note += '⚠ Rise exceeds 7¾" — check local code. ';
+    if (actualRiser < 4) note += '⚠ Rise below 4" — check local code. ';
+    if (run < 10) note += '⚠ Run under 10" — check local code. ';
+    if (!note) note = '✓ Rise and run appear within standard code range. Always verify locally.';
+    document.getElementById('st-out-note').textContent = note;
+    document.getElementById('result-stairs').classList.add('show');
+  }
+
+  // ROOF PITCH
+  function toggleRoofMode() {
+    const mode = document.getElementById('rp-mode').value;
+    document.getElementById('rp-mode-pitch').style.display = mode === 'pitch' ? 'block' : 'none';
+    document.getElementById('rp-mode-measure').style.display = mode === 'measure' ? 'block' : 'none';
+  }
+
+  function calcRoof() {
+    const mode = document.getElementById('rp-mode').value;
+    const result = document.getElementById('result-roofpitch');
+
+    if (mode === 'pitch') {
+      const pitch = parseFloat(document.getElementById('rp-pitch').value);
+      const span = parseFloat(document.getElementById('rp-span').value);
+      const overhang = parseFloat(document.getElementById('rp-overhang').value) || 0;
+      if (!pitch || !span) return;
+
+      const run = span / 2;
+      const rafterRun = run + overhang / 12;
+      const rafterLen = Math.sqrt(Math.pow(rafterRun, 2) + Math.pow((pitch * rafterRun / 12), 2));
+      const angle = Math.atan(pitch / 12) * (180 / Math.PI);
+      const multiplier = Math.sqrt(1 + Math.pow(pitch/12, 2));
+
+      document.getElementById('rp-label1').textContent = 'Rafter Length';
+      document.getElementById('rp-out1').textContent = fmt(rafterLen, 2) + "'";
+      document.getElementById('rp-label2').textContent = 'Roof Angle';
+      document.getElementById('rp-out2').textContent = fmt(angle, 1) + '°';
+      document.getElementById('rp-label3').textContent = 'Pitch';
+      document.getElementById('rp-out3').textContent = pitch + '/12';
+      document.getElementById('rp-out4').textContent = fmt(multiplier, 4);
+    } else {
+      const rise = parseFloat(document.getElementById('rp-rise').value);
+      const run = parseFloat(document.getElementById('rp-run-in').value);
+      if (!rise || !run) return;
+
+      const pitchPer12 = (rise / run) * 12;
+      const angle = Math.atan(rise / run) * (180 / Math.PI);
+      const multiplier = Math.sqrt(1 + Math.pow(rise/run, 2));
+
+      document.getElementById('rp-label1').textContent = 'Pitch Per 12"';
+      document.getElementById('rp-out1').textContent = fmt(pitchPer12, 2) + '/12';
+      document.getElementById('rp-label2').textContent = 'Roof Angle';
+      document.getElementById('rp-out2').textContent = fmt(angle, 1) + '°';
+      document.getElementById('rp-label3').textContent = 'As Fraction';
+      document.getElementById('rp-out3').textContent = fmt(rise,2) + '/' + fmt(run,2);
+      document.getElementById('rp-out4').textContent = fmt(multiplier, 4);
+    }
+    result.classList.add('show');
+  }
+
+  // MATERIAL
+  function toggleMatType() {
+    const type = document.getElementById('mat-type').value;
+    document.getElementById('mat-sheet').style.display = type === 'sheet' ? 'block' : 'none';
+    document.getElementById('mat-linear').style.display = type === 'linear' ? 'block' : 'none';
+    document.getElementById('mat-sqft').style.display = type === 'sqft' ? 'block' : 'none';
+  }
+
+  function calcMaterial() {
+    const type = document.getElementById('mat-type').value;
+    const waste = (parseFloat(document.getElementById('mat-waste').value) || 0) / 100;
+    const result = document.getElementById('result-material');
+
+    if (type === 'sheet') {
+      const aw = parseFloat(document.getElementById('mat-area-w').value);
+      const ah = parseFloat(document.getElementById('mat-area-h').value);
+      const sw = parseFloat(document.getElementById('mat-sheet-w').value) || 4;
+      const sh = parseFloat(document.getElementById('mat-sheet-h').value) || 8;
+      if (!aw || !ah) return;
+      const area = aw * ah;
+      const areaWithWaste = area * (1 + waste);
+      const sheetArea = sw * sh;
+      const sheets = Math.ceil(areaWithWaste / sheetArea);
+      document.getElementById('mat-label1').textContent = 'Area (w/ waste)';
+      document.getElementById('mat-out1').textContent = fmt(areaWithWaste, 1) + ' sq ft';
+      document.getElementById('mat-label2').textContent = 'Sheets Needed';
+      document.getElementById('mat-out2').textContent = sheets + ' sheets';
+      document.getElementById('mat-out-note').textContent = 'Net area: ' + fmt(area,1) + ' sq ft. Sheet size: ' + sw + "×" + sh + "' (" + fmt(sheetArea) + ' sq ft each)';
+    } else if (type === 'linear') {
+      const needed = parseFloat(document.getElementById('mat-lin-needed').value);
+      const length = parseFloat(document.getElementById('mat-lin-length').value) || 16;
+      if (!needed) return;
+      const withWaste = needed * (1 + waste);
+      const boards = Math.ceil(withWaste / length);
+      document.getElementById('mat-label1').textContent = 'Linear Ft (w/ waste)';
+      document.getElementById('mat-out1').textContent = fmt(withWaste, 1) + "'";
+      document.getElementById('mat-label2').textContent = 'Boards Needed';
+      document.getElementById('mat-out2').textContent = boards + ' boards @ ' + length + "'";
+      document.getElementById('mat-out-note').textContent = 'Net needed: ' + needed + "'. Total purchased: " + fmt(boards * length) + "' (" + fmt(boards*length - withWaste,1) + "' leftover)";
+    } else {
+      const w = parseFloat(document.getElementById('mat-sqft-w').value);
+      const l = parseFloat(document.getElementById('mat-sqft-l').value);
+      const unit = parseFloat(document.getElementById('mat-sqft-unit').value);
+      if (!w || !l) return;
+      const area = w * l;
+      const withWaste = area * (1 + waste);
+      const units = unit ? Math.ceil(withWaste / unit) : null;
+      document.getElementById('mat-label1').textContent = 'Sq Ft (w/ waste)';
+      document.getElementById('mat-out1').textContent = fmt(withWaste, 1) + ' sq ft';
+      document.getElementById('mat-label2').textContent = unit ? 'Boxes/Units' : 'Enter unit size';
+      document.getElementById('mat-out2').textContent = units ? units + ' units' : '—';
+      document.getElementById('mat-out-note').textContent = 'Net area: ' + fmt(area,1) + ' sq ft.' + (units && unit ? ' Coverage: ' + fmt(units*unit,1) + ' sq ft purchased.' : '');
+    }
+    result.classList.add('show');
+  }
+
+  // ANGLES
+  function toggleAngType() {
+    const type = document.getElementById('ang-type').value;
+    document.getElementById('ang-miter').style.display = type === 'miter' ? 'block' : 'none';
+    document.getElementById('ang-crown').style.display = type === 'crown' ? 'block' : 'none';
+    document.getElementById('ang-compound').style.display = type === 'compound' ? 'block' : 'none';
+  }
+
+  function calcAngles() {
+    const type = document.getElementById('ang-type').value;
+    const result = document.getElementById('result-angles');
+
+    if (type === 'miter') {
+      const corner = parseFloat(document.getElementById('ang-corner').value) || 90;
+      const miter = corner / 2;
+      document.getElementById('ang-out-miter').textContent = fmt(miter, 1) + '°';
+      document.getElementById('ang-out-bevel').textContent = '0°';
+      document.getElementById('ang-out-note').textContent = 'Flat miter cut. Set saw to ' + fmt(miter,1) + '°. No bevel needed.';
+    } else if (type === 'crown') {
+      const spring = parseFloat(document.getElementById('ang-spring').value);
+      const corner = parseFloat(document.getElementById('ang-crown-corner').value) || 90;
+      // Crown molding compound angle formulas
+      const cornerRad = (corner / 2) * Math.PI / 180;
+      const springRad = spring * Math.PI / 180;
+      const miter = Math.atan(Math.cos(springRad) * Math.tan(cornerRad)) * (180 / Math.PI);
+      const bevel = Math.asin(Math.sin(springRad) * Math.sin(cornerRad)) * (180 / Math.PI);
+      document.getElementById('ang-out-miter').textContent = fmt(miter, 1) + '°';
+      document.getElementById('ang-out-bevel').textContent = fmt(bevel, 1) + '°';
+      document.getElementById('ang-out-note').textContent = spring + '° spring angle, ' + corner + '° corner. Cut crown flat on saw table.';
+    } else {
+      const corner = parseFloat(document.getElementById('ang-comp-corner').value) || 90;
+      const slope = parseFloat(document.getElementById('ang-comp-slope').value) || 0;
+      const cornerRad = (corner / 2) * Math.PI / 180;
+      const slopeRad = slope * Math.PI / 180;
+      const miter = Math.atan(Math.cos(slopeRad) * Math.tan(cornerRad)) * (180 / Math.PI);
+      const bevel = Math.atan(Math.sin(slopeRad) * Math.sin(cornerRad)) * (180 / Math.PI);
+      document.getElementById('ang-out-miter').textContent = fmt(miter, 1) + '°';
+      document.getElementById('ang-out-bevel').textContent = fmt(bevel, 1) + '°';
+      document.getElementById('ang-out-note').textContent = 'Compound cut. Set both miter and bevel on your saw.';
+    }
+    result.classList.add('show');
+  }
+</script>
+</body>
+</html>
