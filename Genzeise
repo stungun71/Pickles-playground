@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gen Z Slang</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --card: #1a1a1a;
+    --card-hover: #222;
+    --text: #e8e4de;
+    --text-muted: #8a8580;
+    --accent-pink: #ff6b9d;
+    --accent-yellow: #ffd166;
+    --accent-green: #06d6a0;
+    --accent-blue: #118ab2;
+    --accent-purple: #b388ff;
+    --accent-orange: #ff8c42;
+    --accent-red: #ef476f;
+    --accent-teal: #2ec4b6;
+    --border: #2a2a2a;
+    --tag-bg: #252525;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .noise-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  header {
+    padding: 60px 24px 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(255,107,157,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(6,214,160,0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .subtitle {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent-pink);
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent-yellow);
+  }
+
+  .header-desc {
+    max-width: 600px;
+    margin: 0 auto;
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.8;
+    position: relative;
+  }
+
+  .search-container {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,13,13,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .search-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .search-box {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-box:focus { border-color: var(--accent-pink); }
+  .search-box::placeholder { color: var(--text-muted); }
+
+  .filter-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 10px;
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .pill:hover { border-color: var(--text-muted); color: var(--text); }
+  .pill.active { border-color: var(--accent-pink); color: var(--accent-pink); background: rgba(255,107,157,0.08); }
+
+  .count-bar {
+    text-align: center;
+    padding: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+  }
+
+  main {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 24px 80px;
+  }
+
+  .category-header {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.6rem;
+    margin: 48px 0 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .category-header .emoji { font-size: 1.4rem; }
+
+  .entry {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin: 14px 0;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .entry:hover {
+    background: var(--card-hover);
+    border-color: #333;
+    transform: translateY(-1px);
+  }
+
+  .entry-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .term {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    line-height: 1.3;
+  }
+
+  .tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--tag-bg);
+  }
+
+  .tag-insult { color: var(--accent-red); }
+  .tag-compliment { color: var(--accent-green); }
+  .tag-neutral { color: var(--accent-blue); }
+  .tag-aesthetic { color: var(--accent-purple); }
+  .tag-phrase { color: var(--accent-orange); }
+  .tag-verb { color: var(--accent-teal); }
+  .tag-mood { color: var(--accent-yellow); }
+
+  .definition {
+    color: var(--text);
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+
+  .example-block {
+    background: rgba(255,255,255,0.03);
+    border-left: 3px solid var(--accent-pink);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 10px 0;
+  }
+
+  .example-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent-pink);
+    margin-bottom: 6px;
+  }
+
+  .example-text {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-style: italic;
+    line-height: 1.7;
+  }
+
+  .roast-block {
+    background: rgba(255,107,157,0.04);
+    border-left: 3px solid var(--accent-yellow);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 10px 0;
+  }
+
+  .roast-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent-yellow);
+    margin-bottom: 6px;
+  }
+
+  .origin-note {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-style: italic;
+  }
+
+  .vibe-meter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .vibe-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .vibe-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .vibe-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-muted);
+  }
+
+  .empty-state .emoji { font-size: 3rem; margin-bottom: 16px; }
+
+  .empty-state p {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.3rem;
+  }
+
+  footer {
+    text-align: center;
+    padding: 40px 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 40px 16px 30px; }
+    main { padding: 16px 16px 60px; }
+    .entry { padding: 18px; }
+    .filter-pills { gap: 4px; }
+    .pill { padding: 5px 10px; font-size: 9px; }
+  }
+</style>
+</head>
+<body>
+<div class="noise-overlay"></div>
+
+<header>
+  <div class="subtitle">They are smarther than they look!</div>
+  <h1>WTF did you say?<br>to <em>Gen Z Slang</em></h1>
+  <p class="header-desc">A fairly well-researched, claude sonnet 4.6 created glossary of the terms, aesthetics, and linguistic confusions that I've been wondering about.  For example, I thought Aesthetic meant tacky to them. Guess not.</p>
+</header>
+
+<div class="search-container">
+  <div class="search-inner">
+    <input type="text" class="search-box" id="searchInput" placeholder="Search terms, definitions, or examples...">
+  </div>
+  <div class="filter-pills" id="filterPills">
+    <button class="pill active" data-filter="all">All</button>
+    <button class="pill" data-filter="roasts">Roasts & Insults</button>
+    <button class="pill" data-filter="compliments">Compliments</button>
+    <button class="pill" data-filter="aesthetics">Aesthetics</button>
+    <button class="pill" data-filter="phrases">Phrases & Sayings</button>
+    <button class="pill" data-filter="social">Social & Dating</button>
+    <button class="pill" data-filter="internet">Internet Culture</button>
+    <button class="pill" data-filter="vibes">Vibes & Moods</button>
+  </div>
+</div>
+
+<div class="count-bar" id="countBar"></div>
+
+<main id="mainContent"></main>
+
+<footer>
+  <p>Compiled with search-engine diligence and the quiet dignity of someone who still says "LOL" out loud.<br>
+  Slang shelf life: approximately 3 weeks. Good luck out there.</p>
+</footer>
+
+<script>
+const entries = [
+  // ═══════════════════════════════
+  // ROASTS & INSULTS
+  // ═══════════════════════════════
+  {
+    term: "Cheugy",
+    category: "roasts",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Aesthetic", type: "aesthetic" }],
+    definition: "The grandmother of all Gen Z insults toward millennials. Something that's trying too hard to be trendy but is actually just outdated and basic. It's not ugly — it's worse. It's <em>trying</em>.",
+    examples: [
+      { type: "example", text: '"She\'s wearing a denim jacket over a floral dress with \'But First, Coffee\' on her travel mug? That\'s so cheugy."' },
+      { type: "roast", text: '"Your entire Pinterest board is cheugy. It\'s like a museum of things that peaked in 2017."' }
+    ],
+    origin: "Coined around 2013 by a high schooler in Beverly Hills, went viral on TikTok in 2021. Targets: skinny jeans, side parts, the cry-laughing emoji (😂), and anything with 'Live Laugh Love.'"
+  },
+  {
+    term: "Coworker Core",
+    category: "roasts",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Aesthetic", type: "aesthetic" }],
+    definition: "A devastating aesthetic label for the comfortable, safe, aggressively boring lifestyle that descends upon you in your 30s and 40s. Your personality has been replaced by routines, ergonomic desk accessories, and opinions about air fryers.",
+    examples: [
+      { type: "example", text: '"She brings her own lunch in a bento box and knows when every Costco sale starts. Peak coworker core."' },
+      { type: "roast", text: '"He got excited about a new brand of sparkling water and talked about it for twenty minutes. Coworker core unlocked."' }
+    ],
+    origin: "Born on TikTok circa 2023-2024. The genius of it is the word 'coworker' — not friend, not family. The person you tolerate because proximity demands it."
+  },
+  {
+    term: "NPC Behavior",
+    category: "roasts",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Internet", type: "neutral" }],
+    definition: "From video games: a Non-Player Character is a background figure who stands there repeating the same scripted line. Applied to humans, it means someone running on autopilot, following social scripts without any original thought.",
+    examples: [
+      { type: "example", text: '"Standing in the elevator saying \'Crazy weather we\'re having, huh?\' solely because the script demands it."' },
+      { type: "roast", text: '"I went full NPC at the grocery store today. Stared at the milk for five minutes and just walked away."' }
+    ],
+    origin: "Gaming culture bled into mainstream TikTok around 2022-2023. Also became a TikTok trend where creators literally act like NPCs on livestreams for tips."
+  },
+  {
+    term: "Corporate Baddie",
+    category: "roasts",
+    tags: [{ label: "Ironic", type: "insult" }, { label: "Phrase", type: "phrase" }],
+    definition: "Originally empowering, now mostly used sarcastically for someone who is way too invested in their meaningless office job. You care about Q3 deliverables. You put on a blazer for a Zoom call. You're thriving. (You're not.)",
+    examples: [
+      { type: "example", text: '"Look at me, answering emails at 8 PM. I\'m such a corporate baddie." (Said while crying inside.)' },
+      { type: "roast", text: '"She changed her LinkedIn banner to a motivational quote. Full corporate baddie arc."' }
+    ],
+    origin: "Evolved from the unironic 'Girl Boss' era into something more self-aware and nihilistic. Peak usage: 2023-present."
+  },
+  {
+    term: "Mid",
+    category: "roasts",
+    tags: [{ label: "Insult", type: "insult" }],
+    definition: "Average. Mediocre. Not terrible, not great — just deeply, existentially unremarkable. Somehow worse than being called bad, because at least 'bad' is memorable.",
+    examples: [
+      { type: "example", text: '"That movie was mid. I\'ve already forgotten the entire plot."' },
+      { type: "roast", text: '"Her playlist is mid. It\'s like algorithmic background music for a dentist\'s office."' }
+    ],
+    origin: "Used in gaming and hip-hop communities for years, went mainstream on TikTok and Twitter around 2021-2022."
+  },
+  {
+    term: "Cringe / Cringey",
+    category: "roasts",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Mood", type: "mood" }],
+    definition: "Something so awkward or embarrassing that it produces a physical reaction. You can feel it in your skeleton. It's secondhand embarrassment weaponized into a single word.",
+    examples: [
+      { type: "example", text: '"He proposed at a baseball game and she said no on the jumbotron. The cringe was lethal."' },
+      { type: "example", text: '"Watching my dad try to use \'lit\' in conversation is physically cringe."' }
+    ],
+    origin: "One of the older Gen Z terms, in use since the early 2010s. Has outlasted nearly every other slang term because the human capacity for secondhand embarrassment is eternal."
+  },
+  {
+    term: "Cooked",
+    category: "roasts",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Mood", type: "mood" }],
+    definition: "Done for. Completely overwhelmed, exhausted, or beyond saving. Not to be confused with 'let them cook' (which is positive). If you ARE cooked, it's over.",
+    examples: [
+      { type: "example", text: '"I have three deadlines tomorrow and I haven\'t started any of them. I\'m cooked."' },
+      { type: "roast", text: '"He showed up to the interview in cargo shorts. He was cooked before he sat down."' }
+    ],
+    origin: "Gaming communities popularized this in competitive contexts (as in 'that player is cooked'), expanded to general life failure around 2023."
+  },
+  {
+    term: "Pick Me",
+    category: "roasts",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Social", type: "neutral" }],
+    definition: "Someone who seeks validation by distinguishing themselves from their own group — usually putting down others to gain attention or approval. The person who says 'I'm not like other girls' is the textbook pick-me.",
+    examples: [
+      { type: "example", text: '"She told him she doesn\'t watch reality TV because she\'s \'not that kind of girl.\' Classic pick me."' },
+      { type: "roast", text: '"He keeps saying he\'s \'one of the good ones.\' Sir, that is pick-me energy."' }
+    ],
+    origin: "Originated in Black communities online, became mainstream Gen Z vocabulary around 2020-2021."
+  },
+
+  // ═══════════════════════════════
+  // COMPLIMENTS & HYPE
+  // ═══════════════════════════════
+  {
+    term: "Slay",
+    category: "compliments",
+    tags: [{ label: "Compliment", type: "compliment" }, { label: "Verb", type: "verb" }],
+    definition: "To do something exceptionally well. To crush it with style and confidence. Originally from drag culture, now universal. Note: older Gen Z considers this slightly dated, but it persists because some words are just too good to die.",
+    examples: [
+      { type: "example", text: '"She walked into that meeting and absolutely slayed. Even the CFO was speechless."' },
+      { type: "example", text: '"You got the promotion AND the corner office? Slay."' }
+    ],
+    origin: "Drag culture and ball culture, dating back decades. Went fully mainstream via Beyoncé and RuPaul's Drag Race."
+  },
+  {
+    term: "Ate (and Left No Crumbs)",
+    category: "compliments",
+    tags: [{ label: "Compliment", type: "compliment" }, { label: "Phrase", type: "phrase" }],
+    definition: "Did something so perfectly, so completely, that there is nothing left for anyone else to improve upon. You consumed the entire moment. Zero waste.",
+    examples: [
+      { type: "example", text: '"Did you see her floor routine? She ate and left no crumbs."' },
+      { type: "example", text: '"That resignation email? She ate. Not a single crumb."' }
+    ],
+    origin: "From drag culture and AAVE (African American Vernacular English). Viral on TikTok starting around 2021."
+  },
+  {
+    term: "Rizz",
+    category: "compliments",
+    tags: [{ label: "Compliment", type: "compliment" }, { label: "Social", type: "neutral" }],
+    definition: "Short for charisma. The effortless ability to charm or attract people, especially romantically. 'Unspoken rizz' is the highest tier — you don't even have to say anything. Oxford named it Word of the Year in 2023.",
+    examples: [
+      { type: "example", text: '"He didn\'t even talk to her, he just made eye contact and she came over. Unspoken rizz."' },
+      { type: "example", text: '"My rizz is strong at networking events but completely absent on dating apps."' }
+    ],
+    origin: "Popularized by Twitch streamer Kai Cenat around 2021-2022. Short for 'charisma.' Became Oxford's 2023 Word of the Year."
+  },
+  {
+    term: "It's Giving ___",
+    category: "compliments",
+    tags: [{ label: "Phrase", type: "phrase" }, { label: "Versatile", type: "neutral" }],
+    definition: "A way of describing what something evokes or radiates. Can be a compliment or an insult depending on what follows. 'It's giving main character' = good. 'It's giving middle school dance chaperone' = not good.",
+    examples: [
+      { type: "example", text: '"That outfit? It\'s giving cozy fall librarian and I am here for it."' },
+      { type: "roast", text: '"His apartment is giving serial killer who reads self-help books. Bare walls, one fork."' }
+    ],
+    origin: "Originated in Black and queer ballroom culture. Went mainstream on TikTok around 2021."
+  },
+  {
+    term: "Fire / Bussin'",
+    category: "compliments",
+    tags: [{ label: "Compliment", type: "compliment" }],
+    definition: "'Fire' means something is excellent or impressive. 'Bussin'' (as in busting with flavor) specifically started with food but now applies to anything amazing. Both are enthusiastic stamps of approval.",
+    examples: [
+      { type: "example", text: '"That taco truck on Rainier? Bussin\'. I\'m not exaggerating, it changed my week."' },
+      { type: "example", text: '"This playlist is fire. Every single track."' }
+    ],
+    origin: "'Fire' has been slang for decades; 'bussin'' comes from AAVE and went viral on TikTok around 2020-2021."
+  },
+  {
+    term: "Aura",
+    category: "compliments",
+    tags: [{ label: "Compliment", type: "compliment" }, { label: "Social", type: "neutral" }],
+    definition: "Someone's perceived coolness, power, or mystique. You can gain aura through impressive moments and lose it through embarrassing ones. Some people talk about 'aura points' like a running score.",
+    examples: [
+      { type: "example", text: '"She showed up 10 minutes late, said nothing, and somehow owned the room. Crazy aura."' },
+      { type: "roast", text: '"He tripped going up the stairs in front of his crush. Minus 500 aura."' }
+    ],
+    origin: "Became popular in basketball/soccer communities on Twitter around 2023, expanded to general use."
+  },
+  {
+    term: "Let Them Cook",
+    category: "compliments",
+    tags: [{ label: "Phrase", type: "phrase" }, { label: "Compliment", type: "compliment" }],
+    definition: "Don't interfere — let them do their thing because they're about to produce something great. An expression of trust in someone's process. The opposite of micromanagement.",
+    examples: [
+      { type: "example", text: '"She\'s been in the studio for 14 hours straight. Let her cook."' },
+      { type: "example", text: '"I don\'t understand his business plan yet but the revenue numbers are wild. Let him cook."' }
+    ],
+    origin: "Sports commentary origins, expanded through Twitter/X meme culture around 2022-2023."
+  },
+  {
+    term: "Pookie",
+    category: "compliments",
+    tags: [{ label: "Compliment", type: "compliment" }, { label: "Affection", type: "mood" }],
+    definition: "A term of endearment for someone you find adorable or care about. Like calling someone 'babe' or 'cutie' but with extra Gen Z playfulness. Used for partners, friends, pets, and occasionally inanimate objects you're attached to.",
+    examples: [
+      { type: "example", text: '"Look at my pookie trying to parallel park. You got this, bestie."' },
+      { type: "example", text: '"My cat is being such a pookie right now. She\'s asleep on my keyboard."' }
+    ],
+    origin: "Originally a German term of endearment from the 1900s, revived on TikTok circa 2023-2024."
+  },
+
+  // ═══════════════════════════════
+  // AESTHETICS & -CORE
+  // ═══════════════════════════════
+  {
+    term: "___core / ___coded",
+    category: "aesthetics",
+    tags: [{ label: "Aesthetic", type: "aesthetic" }, { label: "Suffix", type: "neutral" }],
+    definition: "The most productive suffixes in the Gen Z vocabulary. Add '-core' to literally anything and you've named an aesthetic. Add '-coded' and you're saying something reminds you of that thing. This is how they classify the entire visible world.",
+    examples: [
+      { type: "example", text: '"This small town is so Gilmore Girls coded." / "Your kitchen is suburban-mom-core because you own both a bread machine and an air fryer."' },
+      { type: "example", text: '"Cottagecore, goblincore, ratgirl-core, grandpa-core, coworker core — there is a -core for everything and they are still making more."' }
+    ],
+    origin: "Evolved from music genre naming conventions (hardcore, grindcore) into internet aesthetic taxonomy around 2020. Now infinite."
+  },
+  {
+    term: "Cottagecore",
+    category: "aesthetics",
+    tags: [{ label: "Aesthetic", type: "aesthetic" }],
+    definition: "The romanticized fantasy of rural, pre-industrial life. Baking sourdough, pressing wildflowers, wearing linen, pretending you don't have Wi-Fi. It's pastoral escapism for people who would last approximately 40 minutes on an actual farm.",
+    examples: [
+      { type: "example", text: '"She moved to a studio apartment in Brooklyn but her entire Instagram is cottagecore. There\'s a sourdough starter in front of exposed pipes."' }
+    ],
+    origin: "Exploded during COVID-19 lockdowns in 2020 when everyone suddenly wanted to be a 19th century shepherd."
+  },
+  {
+    term: "Granola Girl / REI Mom",
+    category: "aesthetics",
+    tags: [{ label: "Aesthetic", type: "aesthetic" }, { label: "Insult", type: "insult" }],
+    definition: "The outdoorsy version of Coworker Core. You dress like you're about to summit Rainier — Patagonia fleece, Teva sandals, carabiners on your keys — but the most extreme terrain you navigate is the Whole Foods parking lot.",
+    examples: [
+      { type: "example", text: '"She has a Subaru with a \'Coexist\' sticker but gets road rage in the school drop-off line."' },
+      { type: "roast", text: '"He owns $800 worth of camping gear and has used it once. In his backyard. Granola boy."' }
+    ],
+    origin: "Pacific Northwest energy distilled into an aesthetic label. Very relevant to West Seattle, specifically."
+  },
+  {
+    term: "Sad Beige / Millennial Gray",
+    category: "aesthetics",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Aesthetic", type: "aesthetic" }],
+    definition: "A roast of the modern home aesthetic where everything is devoid of color. Beige walls, gray sofas, wooden toys for children so they match the décor. Your house looks like a showroom for depression.",
+    examples: [
+      { type: "example", text: '"She bought her toddler unpainted wooden blocks so they wouldn\'t clash with the living room. Sad beige parenting."' },
+      { type: "roast", text: '"His apartment is entirely neutral tones. He blends into his own sofa. He IS the sofa."' }
+    ],
+    origin: "The TikTok account @sadbeige became viral for pointing out this trend, particularly in 'sad beige toys for sad beige children.'"
+  },
+  {
+    term: "Clean Girl",
+    category: "aesthetics",
+    tags: [{ label: "Aesthetic", type: "aesthetic" }],
+    definition: "Minimalist, effortless beauty that actually requires enormous effort. Slicked-back bun, dewy skin, gold hoops, neutral everything. You're supposed to look like you woke up this gorgeous, though you absolutely did not.",
+    examples: [
+      { type: "example", text: '"She\'s got the clean girl thing down: no-makeup makeup, a slicked bun, and an iced matcha. It took 45 minutes to look that \'effortless.\'"' }
+    ],
+    origin: "TikTok trend from 2022. Has been criticized for repackaging beauty practices long associated with women of color as a new 'trend.'"
+  },
+  {
+    term: "Coastal Grandmother",
+    category: "aesthetics",
+    tags: [{ label: "Aesthetic", type: "aesthetic" }, { label: "Compliment", type: "compliment" }],
+    definition: "The aspirational lifestyle of a wealthy, relaxed older woman living in a beach house. Think Diane Keaton in anything, Ina Garten, linen pants, reading glasses on a chain, a really good chardonnay. This one is genuinely affectionate.",
+    examples: [
+      { type: "example", text: '"Sun hat, linen shirt, a novel, and a cocktail on the porch. She\'s entered her coastal grandmother era and I deeply respect it."' }
+    ],
+    origin: "Coined by TikTok creator Lex Nicola in January 2022. One of the few aesthetics that's aspirational rather than mocking."
+  },
+  {
+    term: "Goblincore",
+    category: "aesthetics",
+    tags: [{ label: "Aesthetic", type: "aesthetic" }],
+    definition: "The anti-Clean Girl. An aesthetic that celebrates the ugly, the earthy, and the weird. Mushrooms, moss, snails, weird rocks, muddy boots, and collections of things you found on the ground. If your pockets are always full of gravel, this is your people.",
+    examples: [
+      { type: "example", text: '"She came home from a walk with six rocks, a pinecone, and a beetle she named Gerald. Full goblincore."' },
+      { type: "example", text: '"My entire rock collection and thrift store haul energy is apparently very goblincore and I\'m not mad about it."' }
+    ],
+    origin: "Emerged on Tumblr around 2019, grew on TikTok as a counter-movement to polished aesthetics."
+  },
+
+  // ═══════════════════════════════
+  // PHRASES & SAYINGS
+  // ═══════════════════════════════
+  {
+    term: "No Cap / Cap",
+    category: "phrases",
+    tags: [{ label: "Phrase", type: "phrase" }],
+    definition: "'Cap' means a lie. 'No cap' means you're being completely truthful. It's the verbal equivalent of raising your right hand and swearing. 'That's cap' = 'You're lying.'",
+    examples: [
+      { type: "example", text: '"This is the best pizza I\'ve ever had. No cap."' },
+      { type: "example", text: '"He said he ran a six-minute mile. That\'s cap."' }
+    ],
+    origin: "From AAVE and hip-hop culture, in use well before Gen Z but popularized on TikTok and Twitter."
+  },
+  {
+    term: "Touch Grass",
+    category: "phrases",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Phrase", type: "phrase" }],
+    definition: "A command meaning: you are too online. Go outside. Reconnect with the physical world. Your problems are not real problems. Used when someone is spiraling about something that only matters inside a screen.",
+    examples: [
+      { type: "example", text: '"You\'re writing a four-paragraph comment about the font in the new Outlook update. Please touch grass."' },
+      { type: "roast", text: '"He has opinions about Discord server moderation hierarchy. He needs to touch grass immediately."' }
+    ],
+    origin: "Internet forums and gaming communities, went mainstream around 2021-2022."
+  },
+  {
+    term: "Do It for the Plot",
+    category: "phrases",
+    tags: [{ label: "Phrase", type: "phrase" }, { label: "Mood", type: "mood" }],
+    definition: "A philosophy of doing bold, possibly ill-advised things because it will make a good story later. Your life is a narrative and it needs content. Say yes to the questionable decision — it's for the plot.",
+    examples: [
+      { type: "example", text: '"He\'s unemployed and just got out of prison but of course I\'m going on the date. It\'s for the plot."' },
+      { type: "example", text: '"Should I text my ex? ...I\'m doing it for the plot."' }
+    ],
+    origin: "Coined by TikToker Serena Kerrigan, became a widespread mantra for chaotic decision-making around 2023."
+  },
+  {
+    term: "Very Demure, Very Mindful",
+    category: "phrases",
+    tags: [{ label: "Phrase", type: "phrase" }, { label: "Aesthetic", type: "aesthetic" }],
+    definition: "Being elegant, modest, and appropriately restrained. Used both sincerely and ironically to describe doing anything with grace and self-awareness. Dictionary.com's Word of the Year for 2024.",
+    examples: [
+      { type: "example", text: '"See how I eat this sub sandwich? Very demure, very mindful. I keep everything where it\'s supposed to be."' },
+      { type: "example", text: '"I only cried for ten minutes after the meeting. Very demure. Very mindful."' }
+    ],
+    origin: "Originated from a viral TikTok by beauty creator Jools Lebron in August 2024, where she described her modest work makeup. Instantly became a meme format."
+  },
+  {
+    term: "Rent Free",
+    category: "phrases",
+    tags: [{ label: "Phrase", type: "phrase" }],
+    definition: "When something occupies your thoughts constantly without your permission. It's living in your brain and it's not paying rent. Can be a song, a person, a memory, an intrusive thought.",
+    examples: [
+      { type: "example", text: '"I don\'t even like that song but it\'s been living rent free in my head for three weeks."' },
+      { type: "example", text: '"The way she mispronounced \'quinoa\' at dinner lives rent free in my brain."' }
+    ],
+    origin: "Derived from a Trump-era political phrase, evolved into general internet slang around 2020."
+  },
+  {
+    term: "Understood the Assignment",
+    category: "phrases",
+    tags: [{ label: "Compliment", type: "compliment" }, { label: "Phrase", type: "phrase" }],
+    definition: "Nailed it. Did exactly what was required — or exceeded expectations — with full awareness of what the moment called for. The opposite of 'reading the room wrong.'",
+    examples: [
+      { type: "example", text: '"Everyone else showed up in business casual and she walked in wearing a power suit. She understood the assignment."' }
+    ],
+    origin: "Went viral on Twitter and TikTok in 2021, often used in fashion and pop culture contexts."
+  },
+  {
+    term: "This Is the Way",
+    category: "phrases",
+    tags: [{ label: "Phrase", type: "phrase" }],
+    definition: "An expression of strong agreement or solidarity with a decision or way of doing things. It has the ritualistic energy of a creed.",
+    examples: [
+      { type: "example", text: '"She quit her corporate job to sell art at farmers markets." / "This is the way."' }
+    ],
+    origin: "From the Disney+ show The Mandalorian (2019). The Mandalorian creed became internet shorthand for endorsement."
+  },
+
+  // ═══════════════════════════════
+  // SOCIAL & DATING
+  // ═══════════════════════════════
+  {
+    term: "The Ick",
+    category: "social",
+    tags: [{ label: "Social", type: "neutral" }, { label: "Mood", type: "mood" }],
+    definition: "A sudden, uncontrollable wave of repulsion toward someone you were previously attracted to, triggered by something trivial. It's irrational. It's devastating. It's permanent. Once you get the ick, it's over.",
+    examples: [
+      { type: "example", text: '"I got the ick when I saw him running with a backpack on and it was bouncing really high."' },
+      { type: "example", text: '"She got the ick when he used a coupon on a first date."' }
+    ],
+    origin: "Originally from the UK reality show Love Island, became mainstream dating vocabulary around 2020-2022."
+  },
+  {
+    term: "Beige Flag",
+    category: "social",
+    tags: [{ label: "Social", type: "neutral" }, { label: "Insult", type: "insult" }],
+    definition: "Not a red flag (danger) and not a green flag (good sign). A beige flag is something that's just... aggressively boring or weirdly mundane. It's not a dealbreaker, it's a soul-dampener.",
+    examples: [
+      { type: "example", text: '"His beige flag is that he reads the terms and conditions for every app he downloads."' },
+      { type: "roast", text: '"Her beige flag is that she genuinely loves watching unboxing videos of vacuum cleaners."' }
+    ],
+    origin: "A 2023 TikTok dating trend. An evolution of the red flag/green flag framework into the vast, empty territory of 'just... boring.'"
+  },
+  {
+    term: "Ghosting / Zombieing",
+    category: "social",
+    tags: [{ label: "Social", type: "neutral" }, { label: "Verb", type: "verb" }],
+    definition: "Ghosting: vanishing from someone's life without explanation — no texts, no calls, just gone. Zombieing: when the ghost comes BACK, rising from the dead to text 'hey' at 11pm like nothing happened.",
+    examples: [
+      { type: "example", text: '"He ghosted me for three months and then zombied back into my DMs with \'wyd.\' Sir, I attended your funeral."' }
+    ],
+    origin: "Ghosting entered mainstream use around 2015-2016. Zombieing emerged as its natural sequel."
+  },
+  {
+    term: "Soft Launch / Hard Launch",
+    category: "social",
+    tags: [{ label: "Social", type: "neutral" }, { label: "Phrase", type: "phrase" }],
+    definition: "A soft launch is subtly hinting at a new relationship on social media — a hand in a photo, a shoulder, a mystery coffee cup for two. A hard launch is the full reveal: faces, names, relationship status changed. The soft launch is reconnaissance. The hard launch is commitment.",
+    examples: [
+      { type: "example", text: '"She posted a photo of two wine glasses at sunset. That\'s a soft launch. We\'ll have a hard launch by Christmas."' }
+    ],
+    origin: "Borrowed from tech/product terminology. Applied to dating on TikTok and Instagram around 2021."
+  },
+  {
+    term: "Situationship",
+    category: "social",
+    tags: [{ label: "Social", type: "neutral" }],
+    definition: "A romantic involvement that exists in the gray zone between friendship and a defined relationship. You act like a couple, you feel like a couple, but nobody has said the words. It's Schrödinger's relationship.",
+    examples: [
+      { type: "example", text: '"We\'ve been hanging out for four months. Are we dating? Are we friends? It\'s a situationship and I\'m too afraid to ask."' }
+    ],
+    origin: "In use since the late 2010s, became a dominant dating term on TikTok around 2022-2023."
+  },
+  {
+    term: "Roman Empire",
+    category: "social",
+    tags: [{ label: "Phrase", type: "phrase" }, { label: "Mood", type: "mood" }],
+    definition: "Something you think about with alarming frequency. Derived from a viral trend where women asked their male partners how often they think about the Roman Empire (answer: disturbingly often). Now used for any obsessive recurring thought.",
+    examples: [
+      { type: "example", text: '"The fact that octopuses have three hearts is my Roman Empire. I think about it daily."' },
+      { type: "example", text: '"That embarrassing thing I said at a party in 2014 is my Roman Empire."' }
+    ],
+    origin: "A Swedish Instagram trend went viral on TikTok in September 2023."
+  },
+  {
+    term: "Delulu (Is the Solulu)",
+    category: "social",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Phrase", type: "phrase" }],
+    definition: "Short for 'delusional.' Someone who believes in unrealistic or wildly optimistic outcomes. But the full phrase — 'delulu is the solulu' (delusion is the solution) — flips it into a strange kind of empowerment. Manifest your fantasies, bestie.",
+    examples: [
+      { type: "example", text: '"I\'m going to marry that celebrity someday." — "Girl... delulu."' },
+      { type: "example", text: '"I applied for a job I\'m wildly unqualified for. Delulu is the solulu."' }
+    ],
+    origin: "Originally from K-pop fan culture (delusional fans of idols), entered mainstream Gen Z around 2023."
+  },
+
+  // ═══════════════════════════════
+  // INTERNET CULTURE
+  // ═══════════════════════════════
+  {
+    term: "Brain Rot",
+    category: "internet",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Internet", type: "neutral" }],
+    definition: "The deterioration of your mental state from consuming too much low-quality internet content. When you've scrolled so deep into TikTok that you can no longer form coherent thoughts. Oxford's Word of the Year for 2024.",
+    examples: [
+      { type: "example", text: '"I just watched 90 minutes of videos about people organizing their fridges. The brain rot is terminal."' },
+      { type: "example", text: '"My brain rot is so bad I accidentally said \'no cap\' in a work meeting."' }
+    ],
+    origin: "Though the concept has existed since social media began, 'brain rot' as Gen Z slang surged in 2023-2024."
+  },
+  {
+    term: "Caught in 4K",
+    category: "internet",
+    tags: [{ label: "Phrase", type: "phrase" }, { label: "Internet", type: "neutral" }],
+    definition: "Caught red-handed, with evidence so clear it might as well be in ultra-high-definition video. There is no plausible deniability. The receipts are in 4K resolution.",
+    examples: [
+      { type: "example", text: '"She said she was staying in but I saw her Instagram story at the club. Caught in 4K."' },
+      { type: "example", text: '"He liked his ex\'s photo from 47 weeks ago. Caught in 4K with the scrolling thumb."' }
+    ],
+    origin: "Internet/meme culture, went mainstream around 2020-2021."
+  },
+  {
+    term: "Main Character Syndrome",
+    category: "internet",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Internet", type: "neutral" }],
+    definition: "Believing you are the protagonist of a movie and everyone else is a supporting character. In its flattering form: living boldly. In its Coworker Core form: putting on headphones and walking dramatically through the Target parking lot like you're in a music video, even though you're just buying toilet paper.",
+    examples: [
+      { type: "example", text: '"She narrates her morning routine in her head like it\'s a film opening. Main character syndrome."' },
+      { type: "roast", text: '"He wore sunglasses indoors at Costco. That\'s main character syndrome with no supporting evidence."' }
+    ],
+    origin: "TikTok trend from 2020-2021 encouraging people to 'be the main character.' Quickly became both aspirational and a roast."
+  },
+  {
+    term: "Girl Dinner",
+    category: "internet",
+    tags: [{ label: "Phrase", type: "phrase" }, { label: "Internet", type: "neutral" }],
+    definition: "A meal composed of random snack items assembled with zero cooking. Could be artful (a charcuterie board for one) or chaotic (three crackers, a pickle, and a handful of cereal). The point is: it's food and you made zero effort.",
+    examples: [
+      { type: "example", text: '"Cheese cubes, some grapes, leftover halloween candy, and a sparkling water. Girl dinner."' }
+    ],
+    origin: "TikTok trend from 2023 coined by creator Olivia Maher. Became a cultural moment about the reality of solo dining."
+  },
+  {
+    term: "Brat",
+    category: "internet",
+    tags: [{ label: "Aesthetic", type: "aesthetic" }, { label: "Compliment", type: "compliment" }],
+    definition: "Redefined by Charli XCX's 2024 album into a full cultural identity. A 'brat' is messy, honest, nonconformist, and unapologetically herself. Think: cigarettes, a strappy white top, no bra, and saying exactly what you think. It's chaos with confidence.",
+    examples: [
+      { type: "example", text: '"She showed up late, said something controversial, and everyone loved her for it. Brat summer energy."' }
+    ],
+    origin: "The album 'BRAT' by Charli XCX (June 2024) and its lime-green aesthetic became the cultural vibe of Summer 2024."
+  },
+  {
+    term: "Skibidi",
+    category: "internet",
+    tags: [{ label: "Internet", type: "neutral" }, { label: "Chaos", type: "mood" }],
+    definition: "A nonsense word from a viral YouTube series about singing toilet heads (yes, really). It means everything and nothing simultaneously. Can signal chaos, absurdity, approval, or just be filler noise. Added to the Cambridge Dictionary in 2025. Don't try to understand it. Just accept it.",
+    examples: [
+      { type: "example", text: '"What does skibidi mean?" — "It means skibidi." — "But what does—" — "Skibidi."' }
+    ],
+    origin: "From the YouTube series 'Skibidi Toilet' by Alexey Gerasimov, which has billions of views. Mostly used by Gen Alpha and younger Gen Z."
+  },
+  {
+    term: "Hurkle-Durkle",
+    category: "internet",
+    tags: [{ label: "Verb", type: "verb" }, { label: "Mood", type: "mood" }],
+    definition: "An old Scottish word meaning 'to lie in bed or lounge about when you should be up and doing things.' Revived by the internet because Gen Z recognized their own behavior in a 200-year-old word.",
+    examples: [
+      { type: "example", text: '"I woke up at 7 but stared at my phone until 8:15. Heavy hurkle-durkle."' },
+      { type: "example", text: '"I can\'t come out, I\'m deep in a hurkle-durkle. Maybe tomorrow."' }
+    ],
+    origin: "Scottish dialect, documented in John Jamieson's 1808 dictionary. Went viral on TikTok in early 2024."
+  },
+  {
+    term: "Yellow Font / Pink Font",
+    category: "internet",
+    tags: [{ label: "Internet", type: "neutral" }, { label: "Mood", type: "mood" }],
+    definition: "A color-coded system for emotional vulnerability on TikTok. Yellow font signals: 'this is real, this is serious, I'm being vulnerable.' Pink font: relatable or love-adjacent content. Rainbow font: chaotic or celebratory. It's a visual tone indicator.",
+    examples: [
+      { type: "example", text: '"She posted about her anxiety but added \'yellow font btw\' so everyone knows she\'s not joking."' }
+    ],
+    origin: "Emerged on TikTok in late 2025 as a Gen Z communication shortcut for sincerity, similar to Reddit tone markers like /gen."
+  },
+
+  // ═══════════════════════════════
+  // VIBES & MOODS
+  // ═══════════════════════════════
+  {
+    term: "Vibe Check",
+    category: "vibes",
+    tags: [{ label: "Phrase", type: "phrase" }, { label: "Mood", type: "mood" }],
+    definition: "An assessment of someone's energy or the mood of a situation. Can be a casual question ('vibe check — how are we feeling?') or a warning that someone's energy is about to be evaluated and possibly found wanting.",
+    examples: [
+      { type: "example", text: '"Walking into this party... vibe check: everybody\'s on their phones. We\'re leaving."' },
+      { type: "example", text: '"Quick vibe check before we start this meeting — everyone okay?"' }
+    ],
+    origin: "Internet culture, popularized on TikTok around 2019-2020. Originally more threatening ('vibe check' accompanied by an image of a fist)."
+  },
+  {
+    term: "Era",
+    category: "vibes",
+    tags: [{ label: "Phrase", type: "phrase" }, { label: "Mood", type: "mood" }],
+    definition: "A phase you're currently in, defined by whatever you're focused on or embodying. Inspired by Taylor Swift's distinct album 'eras,' now used for everything from personal growth to emotional spirals.",
+    examples: [
+      { type: "example", text: '"I\'m in my healing era. No dating, lots of journaling, excessive candle purchases."' },
+      { type: "example", text: '"He\'s in his villain era — he stopped responding to group texts and started a side hustle."' }
+    ],
+    origin: "Popularized by Taylor Swift's Eras Tour (2023-2024) but the concept was already percolating on TikTok."
+  },
+  {
+    term: "Vibes / The Vibes Are Off",
+    category: "vibes",
+    tags: [{ label: "Mood", type: "mood" }],
+    definition: "'Vibes' is the general energy of a person, place, or situation. When 'the vibes are off,' something feels wrong but you can't articulate exactly what. It's an emotional weather report with no data.",
+    examples: [
+      { type: "example", text: '"I walked into the restaurant and immediately left. The vibes were off. I can\'t explain it."' },
+      { type: "example", text: '"She says she\'s fine but the vibes are off. Something happened."' }
+    ],
+    origin: "While 'vibes' has been slang since the 1960s, Gen Z elevated 'the vibes are off' into a diagnostic framework around 2020."
+  },
+  {
+    term: "Hits Different",
+    category: "vibes",
+    tags: [{ label: "Phrase", type: "phrase" }, { label: "Mood", type: "mood" }],
+    definition: "Something that has a uniquely powerful emotional impact compared to similar things. The same song might be fine normally, but at 2am on a rainy night? It hits different. Context transforms the experience.",
+    examples: [
+      { type: "example", text: '"Water after a long hike hits different."' },
+      { type: "example", text: '"That song from 2008 hits different when you\'re going through a breakup in your 40s."' }
+    ],
+    origin: "AAVE origins, went mainstream on TikTok and Twitter around 2019-2020."
+  },
+  {
+    term: "Living My Best Life",
+    category: "vibes",
+    tags: [{ label: "Phrase", type: "phrase" }],
+    definition: "Originally sincere — a declaration of thriving. Now used both genuinely and with a heavy dose of irony, where 'my best life' might mean eating cereal at 3pm in your underwear. The gap between aspiration and reality is the joke.",
+    examples: [
+      { type: "example", text: '"Three-day weekend, no plans, a new season of my show just dropped. Living my best life."' },
+      { type: "roast", text: '"I\'m eating cold pizza over the sink at midnight. Living my best life. (Narrator: she was not.)"' }
+    ],
+    origin: "Popularized by Lil Duval's 2018 song, became ubiquitous on Instagram, then ironicized by Gen Z."
+  },
+  {
+    term: "Secure the Bag / Fumble the Bag",
+    category: "vibes",
+    tags: [{ label: "Phrase", type: "phrase" }],
+    definition: "'Secure the bag' means working hard to achieve your goals — the 'bag' is money, success, or any big opportunity. 'Fumble the bag' is the devastating opposite: you had it and you dropped it.",
+    examples: [
+      { type: "example", text: '"She negotiated a 30% raise and four weeks PTO. Bag: secured."' },
+      { type: "example", text: '"He had a second interview lined up and forgot to show up. Absolutely fumbled the bag."' }
+    ],
+    origin: "From hip-hop culture, became mainstream Gen Z motivational/cautionary language."
+  },
+  {
+    term: "Caught a Vibe",
+    category: "vibes",
+    tags: [{ label: "Mood", type: "mood" }, { label: "Compliment", type: "compliment" }],
+    definition: "When you settle into a perfect mood or flow state. Everything aligns — the music, the weather, the energy. You didn't plan it. It just happened. You caught a vibe.",
+    examples: [
+      { type: "example", text: '"Windows down, sunset, perfect playlist going — I\'ve caught a vibe and I refuse to go home."' }
+    ],
+    origin: "General music/culture slang, popularized in the streaming era."
+  },
+  {
+    term: "Unalive",
+    category: "vibes",
+    tags: [{ label: "Internet", type: "neutral" }, { label: "Phrase", type: "phrase" }],
+    definition: "A euphemism created because social media algorithms censor or suppress content that uses the word 'kill,' 'die,' or 'dead.' Used both in serious contexts (discussing harm) and casually ('that joke unalived me'). It's a strange artifact of algorithmic language policing.",
+    examples: [
+      { type: "example", text: '"That pun was so bad it unalived me." (Casual: meaning it was so funny I\'m metaphorically dead.)' }
+    ],
+    origin: "Born from TikTok and YouTube content moderation. Creators started using coded language to avoid demonetization or removal."
+  },
+  {
+    term: "Wabi Sabi",
+    category: "vibes",
+    tags: [{ label: "Phrase", type: "phrase" }, { label: "Internet", type: "neutral" }],
+    definition: "Originally a Japanese concept about finding beauty in imperfection, dating back centuries. Gen Z revived it after a King of the Hill clip went viral in 2025. Started as teens posting their own charming imperfections, then evolved into a passive-aggressive way to give backhanded compliments.",
+    examples: [
+      { type: "example", text: '"I like your outfit, it\'s so wabi sabi." (Translation: your outfit is a mess but I\'m being polite about it.)' }
+    ],
+    origin: "16th-century Japanese philosophy → resurfaced King of the Hill clip → TikTok trend in 2025."
+  },
+
+  // ═══════════════════════════════
+  // BATCH 2 — NEW ENTRIES
+  // ═══════════════════════════════
+
+  // MORE ROASTS & INSULTS
+  {
+    term: "Sus",
+    category: "roasts",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Versatile", type: "neutral" }],
+    definition: "Short for 'suspicious.' Something seems off, shady, or not quite right. Massively amplified by the game Among Us, where you literally vote to eject the 'sus' player into space.",
+    examples: [
+      { type: "example", text: '"He said he was working late but his location showed him at Buffalo Wild Wings. That\'s sus."' },
+      { type: "example", text: '"She offered to do all the group project work herself. Extremely sus."' }
+    ],
+    origin: "In casual use since at least the 1960s, but the video game Among Us (2020) made it inescapable."
+  },
+  {
+    term: "Extra",
+    category: "roasts",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Mood", type: "mood" }],
+    definition: "Over the top. Dramatic. Doing way more than the situation calls for. It can be used affectionately or as a roast, depending on whether the excess is charming or exhausting.",
+    examples: [
+      { type: "example", text: '"He threw a birthday party for his dog with a three-tier cake and invitations. So extra."' },
+      { type: "example", text: '"She brought a ring light to a casual brunch. That\'s extra."' }
+    ],
+    origin: "AAVE origins, mainstream Gen Z usage since the late 2010s."
+  },
+  {
+    term: "Simp",
+    category: "roasts",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Social", type: "neutral" }],
+    definition: "Someone who does way too much for a person they have a crush on, often getting nothing in return. Putting someone on a pedestal to a degree that becomes embarrassing for everyone involved.",
+    examples: [
+      { type: "example", text: '"He drove two hours to bring her Starbucks and she didn\'t even text back. King of simps."' },
+      { type: "roast", text: '"He liked all 347 of her Instagram photos in one sitting. Simping at an Olympic level."' }
+    ],
+    origin: "Online slang since the late 2010s, exploded on TikTok in 2020. Sometimes debated as unfairly mocking genuine kindness."
+  },
+  {
+    term: "Yap / Yapping",
+    category: "roasts",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Verb", type: "verb" }],
+    definition: "Talking too much. Going on and on about something no one asked about. A 'yapper' is someone who simply will not stop talking. Can be self-deprecating: 'Sorry I was yapping.'",
+    examples: [
+      { type: "example", text: '"She asked how my weekend was and I yapped for fifteen minutes about my new rock tumbler. Her eyes glazed over around minute three."' },
+      { type: "roast", text: '"He\'s the biggest yapper in the group chat. Three paragraphs minimum per message."' }
+    ],
+    origin: "Surged on TikTok in 2024 as a playful way to describe chronic over-talkers."
+  },
+  {
+    term: "Chronically Online",
+    category: "roasts",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Internet", type: "neutral" }],
+    definition: "Someone so deeply embedded in internet culture that they've lost touch with how normal people talk and think. They reference memes in real conversations. They have opinions about Discord server governance. They need to go outside.",
+    examples: [
+      { type: "example", text: '"She described her coworker\'s outfit as \'giving cottagecore meets corporate baddie with a hint of goblincore.\' She is chronically online."' },
+      { type: "example", text: '"He used the word \'problematic\' three times at dinner. Chronically online behavior."' }
+    ],
+    origin: "Internet meta-commentary, became widely used around 2021-2022 as a way to describe people who need to touch grass."
+  },
+  {
+    term: "Glaze / Glazing",
+    category: "roasts",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Verb", type: "verb" }],
+    definition: "Excessively praising or hyping someone up, to the point of sycophancy. You're laying it on so thick they're glazed like a donut. Think: commenting 'KING' on every single thing someone posts.",
+    examples: [
+      { type: "example", text: '"Every time he posts a selfie, she comments a full paragraph of compliments. She\'s glazing hard."' },
+      { type: "roast", text: '"Stop glazing. It was a decent PowerPoint, not a TED Talk."' }
+    ],
+    origin: "Gaming and online culture, became widespread on TikTok and Twitter/X around 2023-2024."
+  },
+  {
+    term: "Oof / Big Oof",
+    category: "roasts",
+    tags: [{ label: "Mood", type: "mood" }],
+    definition: "An expression of sympathy, discomfort, or secondhand pain. A regular 'oof' is mild. A 'big oof' is witnessing a disaster so significant it requires the expanded version.",
+    examples: [
+      { type: "example", text: '"She texted her rant about her boss... to her boss. Big oof."' },
+      { type: "example", text: '"He showed up to the wrong restaurant for the date. Oof."' }
+    ],
+    origin: "Popularized by the Roblox death sound effect, became universal internet expression of cringe-sympathy."
+  },
+
+  // MORE COMPLIMENTS & HYPE
+  {
+    term: "Snatched",
+    category: "compliments",
+    tags: [{ label: "Compliment", type: "compliment" }],
+    definition: "Looking incredibly good. Flawless. Everything is tight, polished, and perfect — your outfit, your makeup, your entire being. Originally about a cinched waist, now applies to anything that looks stunning.",
+    examples: [
+      { type: "example", text: '"Her eyebrows? Snatched. Her outfit? Snatched. Her attitude? Also snatched."' },
+      { type: "example", text: '"You look snatched in that dress. Where did you even find it?"' }
+    ],
+    origin: "Drag and ballroom culture, where 'snatching' meant pulling off an impeccable look. Mainstream since the late 2010s."
+  },
+  {
+    term: "Drip",
+    category: "compliments",
+    tags: [{ label: "Compliment", type: "compliment" }],
+    definition: "Style so abundant you're saturated by it. You are dripping with fashion. Can be a noun (your outfit) or an adjective (your general state of being incredibly well-dressed).",
+    examples: [
+      { type: "example", text: '"Look at his new earrings and that jacket. He\'s got the drip."' },
+      { type: "example", text: '"Showed up to the farmers market with the drip today — vintage Carhartt and clean Vans."' }
+    ],
+    origin: "Hip-hop culture, made mainstream through songs like Bruno Mars' 'Finesse' — 'drippin' in finesse.'"
+  },
+  {
+    term: "Face Card (Never Declines)",
+    category: "compliments",
+    tags: [{ label: "Compliment", type: "compliment" }, { label: "Phrase", type: "phrase" }],
+    definition: "Your face is so attractive that it works like a credit card that never gets declined. No matter the lighting, the angle, or the circumstances — your face card always goes through.",
+    examples: [
+      { type: "example", text: '"No makeup, messy hair, just woke up — and her face card still didn\'t decline."' },
+      { type: "example", text: '"That passport photo? Face card accepted. How is that even possible."' }
+    ],
+    origin: "TikTok and Twitter/X, became a popular compliment format around 2022-2023."
+  },
+  {
+    term: "Glow Up",
+    category: "compliments",
+    tags: [{ label: "Compliment", type: "compliment" }, { label: "Phrase", type: "phrase" }],
+    definition: "A dramatic positive transformation — in appearance, confidence, life circumstances, or all three. The before-and-after of becoming your best self. The opposite of a 'glow down.'",
+    examples: [
+      { type: "example", text: '"She left that toxic job, started hiking, and showed up to the reunion looking like a different person. That\'s a glow up."' },
+      { type: "example", text: '"My glow up was realizing I don\'t have to reply to every email within five minutes."' }
+    ],
+    origin: "In use since the mid-2010s, became a major TikTok format for transformation videos."
+  },
+  {
+    term: "Based",
+    category: "compliments",
+    tags: [{ label: "Compliment", type: "compliment" }],
+    definition: "Being unapologetically yourself. Saying what you think without caring about backlash. Originally coined by rapper Lil B, who defined it as 'being yourself and not being scared of what people think.' Can be used sincerely or ironically.",
+    examples: [
+      { type: "example", text: '"She told the entire meeting that the company strategy was wrong and explained why. Based."' },
+      { type: "example", text: '"He eats cereal for dinner every night and doesn\'t apologize for it. Honestly? Based."' }
+    ],
+    origin: "Coined by rapper Lil B 'The BasedGod.' Migrated through internet culture, became widespread around 2020-2021."
+  },
+
+  // MORE AESTHETICS
+  {
+    term: "Old Money",
+    category: "aesthetics",
+    tags: [{ label: "Aesthetic", type: "aesthetic" }],
+    definition: "The aesthetic of generational wealth so deep you'd never actually talk about it. Think: quiet luxury, cashmere, tennis clubs, boat shoes without socks, Nantucket energy. The opposite of flashy new-money displays.",
+    examples: [
+      { type: "example", text: '"Neutral polo, loafers, no logos visible anywhere. He\'s giving old money and he bought it all at Goodwill."' },
+      { type: "example", text: '"Her apartment has hardcover books she\'s actually read and fresh flowers in a vase that wasn\'t from Target. Old money coded."' }
+    ],
+    origin: "Surged on TikTok in 2023 alongside the 'quiet luxury' trend and Succession's final season."
+  },
+  {
+    term: "Barbiecore",
+    category: "aesthetics",
+    tags: [{ label: "Aesthetic", type: "aesthetic" }],
+    definition: "Everything pink. Aggressively pink. Inspired by the 2023 Barbie movie, this aesthetic celebrates femininity dialed to maximum: hot pink everything, glitter, platform shoes, the unshakeable belief that you can be anything.",
+    examples: [
+      { type: "example", text: '"She wore head-to-toe hot pink to the office on a random Tuesday. Full Barbiecore. The accounting department was shook."' }
+    ],
+    origin: "Existed in fashion before, but Greta Gerwig's 2023 Barbie movie turned it into a cultural moment."
+  },
+  {
+    term: "Coquette",
+    category: "aesthetics",
+    tags: [{ label: "Aesthetic", type: "aesthetic" }],
+    definition: "Ultra-feminine, flirty, and romantic. Ribbons, bows, lace, soft pink, delicate jewelry, doe eyes. If Barbiecore is loud femininity, coquette is its whispery, eyelash-batting cousin.",
+    examples: [
+      { type: "example", text: '"Ribbon in her hair, ballet flats, a bow on literally everything — full coquette era."' }
+    ],
+    origin: "Originated on Tumblr in the 2010s (originally called 'Lolita-core'), rebranded and surged on TikTok around 2023-2024."
+  },
+
+  // MORE PHRASES
+  {
+    term: "Spill the Tea",
+    category: "phrases",
+    tags: [{ label: "Phrase", type: "phrase" }, { label: "Social", type: "neutral" }],
+    definition: "'Tea' is gossip. To 'spill the tea' is to share the gossip. To 'sip tea' is to listen to the gossip while enjoying the drama. The entire metaphor treats juicy information like a hot beverage you can't put down.",
+    examples: [
+      { type: "example", text: '"You were at that party last night? Spill the tea immediately."' },
+      { type: "example", text: '"I have no drama of my own but I will sip tea all day long."' }
+    ],
+    origin: "Drag culture, specifically popularized by RuPaul's Drag Race. Went fully mainstream in the late 2010s."
+  },
+  {
+    term: "Gatekeep, Gaslight, Girlboss",
+    category: "phrases",
+    tags: [{ label: "Phrase", type: "phrase" }, { label: "Ironic", type: "insult" }],
+    definition: "A satirical mantra that mocks the 'Girlboss' era by combining it with two toxic behaviors. Used ironically to describe someone (or yourself) acting shamelessly self-serving. Sometimes shortened to just the three Gs.",
+    examples: [
+      { type: "example", text: '"She refused to share her skincare routine, lied about the brand, and posted a motivational quote about it. Gatekeep, gaslight, girlboss."' }
+    ],
+    origin: "Meme that emerged in 2021 as a satirical response to the uncritical 'Girl Boss' empowerment branding of the late 2010s."
+  },
+  {
+    term: "Say Less",
+    category: "phrases",
+    tags: [{ label: "Phrase", type: "phrase" }],
+    definition: "I understand completely. You don't need to explain further. I'm already on it. It's enthusiastic agreement compressed into two words.",
+    examples: [
+      { type: "example", text: '"Wanna grab tacos?" — "Say less." (Already getting shoes on.)' },
+      { type: "example", text: '"The concert tickets are only $30." — "Say less."' }
+    ],
+    origin: "AAVE origins, went mainstream on social media in the early 2020s."
+  },
+  {
+    term: "Bet",
+    category: "phrases",
+    tags: [{ label: "Phrase", type: "phrase" }],
+    definition: "An affirmation. It means 'okay,' 'sounds good,' 'deal,' or 'you're on.' Short, definitive, no further discussion needed.",
+    examples: [
+      { type: "example", text: '"I\'ll pick you up at 7." — "Bet."' },
+      { type: "example", text: '"If you finish the report by Friday, I\'ll buy lunch." — "Bet."' }
+    ],
+    origin: "AAVE, in use for decades. The Gen Z equivalent of the millennial 'word.'"
+  },
+  {
+    term: "Periodt",
+    category: "phrases",
+    tags: [{ label: "Phrase", type: "phrase" }],
+    definition: "Period, but emphasized. End of discussion. There's nothing more to say. The 't' at the end is the sound of the gavel coming down. Often used to punctuate a definitive statement.",
+    examples: [
+      { type: "example", text: '"She\'s the most talented person in this building and that\'s on periodt."' },
+      { type: "example", text: '"We\'re not going back to the office five days a week. Periodt."' }
+    ],
+    origin: "AAVE, particularly from the Black South where the final 'd' shifts to a 't' sound. Popularized through memes and RuPaul's Drag Race."
+  },
+  {
+    term: "Couldn't Be Me",
+    category: "phrases",
+    tags: [{ label: "Phrase", type: "phrase" }],
+    definition: "A declaration that you would never do whatever is being described. Can be judgmental, self-aware, or both. Sometimes it's genuine superiority. Sometimes it's envy disguised as indifference.",
+    examples: [
+      { type: "example", text: '"She\'s doing a polar plunge for charity. In January. In Puget Sound. Couldn\'t be me."' },
+      { type: "example", text: '"They got up at 5am to go to a sale. Couldn\'t be me. (It could absolutely be me for the right thrift store.)"' }
+    ],
+    origin: "Internet culture, widely used on Twitter and TikTok since the late 2010s."
+  },
+
+  // MORE SOCIAL & DATING
+  {
+    term: "Stan",
+    category: "social",
+    tags: [{ label: "Social", type: "neutral" }, { label: "Verb", type: "verb" }],
+    definition: "An obsessive fan. To 'stan' someone is to support them with extreme devotion. Can be positive ('we stan a queen') or cautionary — the word literally comes from a song about a stalker fan.",
+    examples: [
+      { type: "example", text: '"We stan a short king." (A compliment to a specific person who is short and wonderful.)' },
+      { type: "example", text: '"She knows every lyric, every interview, every outfit. Full stan behavior."' }
+    ],
+    origin: "From Eminem's 2000 song 'Stan' about an obsessive fan named Stanley Mitchell. Now used casually for any strong fandom."
+  },
+  {
+    term: "Ratio",
+    category: "social",
+    tags: [{ label: "Internet", type: "neutral" }, { label: "Insult", type: "insult" }],
+    definition: "When a reply to your post gets more likes than the original post, you've been 'ratioed.' It means the internet collectively decided the response was better — or more correct — than what you said. A public L.",
+    examples: [
+      { type: "example", text: '"He posted a bad take about pineapple on pizza and got ratioed instantly. 47 likes on his post, 2,000 on the reply that said \'wrong.\'"' }
+    ],
+    origin: "Twitter/X culture, became a mainstream concept around 2020-2021."
+  },
+  {
+    term: "W / L (Win / Loss)",
+    category: "social",
+    tags: [{ label: "Phrase", type: "phrase" }],
+    definition: "The simplest possible assessment. 'W' means win — something good. 'L' means loss — something bad. Can be applied to literally any situation. 'Massive W' and 'massive L' for extreme cases.",
+    examples: [
+      { type: "example", text: '"Free parking right in front of the store? W."' },
+      { type: "example", text: '"He accidentally liked her photo from 2019 while stalking her profile. Massive L."' }
+    ],
+    origin: "Sports and gaming terminology, adopted into everyday Gen Z assessment of... everything."
+  },
+  {
+    term: "Throwing Shade",
+    category: "social",
+    tags: [{ label: "Verb", type: "verb" }, { label: "Social", type: "neutral" }],
+    definition: "Delivering a subtle, indirect insult. It's not aggressive — it's elegant. The art of the backhanded compliment. Shade requires finesse; if everyone notices, you've failed. If only the target notices, you've mastered it.",
+    examples: [
+      { type: "example", text: '"She said \'Oh, you\'re so brave for wearing that.\' Shade. Pure shade."' },
+      { type: "example", text: '"He complimented everyone\'s dish at the potluck except mine. The shade was immaculate."' }
+    ],
+    origin: "Ball culture and drag culture, popularized by the 1990 documentary Paris Is Burning. RuPaul's Drag Race made it mainstream."
+  },
+
+  // MORE VIBES & MOODS
+  {
+    term: "Dead / I'm Dead / 💀",
+    category: "vibes",
+    tags: [{ label: "Mood", type: "mood" }],
+    definition: "Something is so funny it has killed you. You are no longer alive. The skull emoji (💀) serves the same function. This replaced 'LOL' for Gen Z because apparently laughing isn't dramatic enough — you must perish.",
+    examples: [
+      { type: "example", text: '"Did you see that video of the dog stealing the pizza off the counter? I\'m dead. 💀"' },
+      { type: "example", text: '"He sent me a meme at 2am and I was dead for ten minutes."' }
+    ],
+    origin: "Evolved from 'I'm dying' (laughing). The skull emoji became the Gen Z replacement for 😂, which they consider cheugy."
+  },
+  {
+    term: "Shook",
+    category: "vibes",
+    tags: [{ label: "Mood", type: "mood" }],
+    definition: "Shocked. Stunned. Emotionally rocked by something you did not see coming. Deeper than surprised — you are physically rattled. Your foundation has been disturbed.",
+    examples: [
+      { type: "example", text: '"She showed up to the reunion with a whole new career, a new city, and a glow up. I was shook."' },
+      { type: "example", text: '"I found a first edition at the thrift store for $2. Absolutely shook."' }
+    ],
+    origin: "AAVE, popularized on social media in the late 2010s."
+  },
+  {
+    term: "Low-key / High-key",
+    category: "vibes",
+    tags: [{ label: "Mood", type: "mood" }],
+    definition: "'Low-key' means subtly, secretly, or a little bit. 'High-key' means obviously, loudly, or very much. They're the volume knobs of how much you want to commit to a statement.",
+    examples: [
+      { type: "example", text: '"I low-key want to leave this party." (Whispered desire.)' },
+      { type: "example", text: '"I high-key need a vacation. Like, right now. Immediately."' }
+    ],
+    origin: "In casual use since the 2010s, became standard Gen Z modifiers."
+  },
+  {
+    term: "Cope / Copium",
+    category: "vibes",
+    tags: [{ label: "Insult", type: "insult" }, { label: "Mood", type: "mood" }],
+    definition: "'Cope' means you're rationalizing or making excuses to deal with an unfavorable reality. 'Copium' is the imaginary substance you're inhaling to maintain your delusions. Used when someone can't accept that they took an L.",
+    examples: [
+      { type: "example", text: '"He said he\'s glad she dumped him because he \'needed more time for his hobbies.\' That\'s pure copium."' },
+      { type: "example", text: '"Your team lost by 30 points and you\'re saying the refs were biased? Cope."' }
+    ],
+    origin: "Gaming and internet culture. 'Copium' is a portmanteau of 'cope' and 'opium,' usually shown as a meme of someone huffing from a tank."
+  },
+  {
+    term: "Menty B",
+    category: "vibes",
+    tags: [{ label: "Mood", type: "mood" }, { label: "Phrase", type: "phrase" }],
+    definition: "Short for 'mental breakdown,' but said in a cute, abbreviation-heavy way that makes it feel survivable. A way to acknowledge you're losing it while maintaining a sense of humor about the whole thing.",
+    examples: [
+      { type: "example", text: '"I have three projects due, my car made a weird noise, and I forgot to eat lunch. Having a little menty b."' },
+      { type: "example", text: '"Nothing like a quick menty b in the work bathroom to reset for the afternoon."' }
+    ],
+    origin: "TikTok slang from around 2022-2023. Part of a trend of cutesy abbreviations for dark realities."
+  },
+  {
+    term: "Locked In",
+    category: "vibes",
+    tags: [{ label: "Mood", type: "mood" }, { label: "Compliment", type: "compliment" }],
+    definition: "In the zone. Completely focused. You've eliminated all distractions and you're operating at peak performance. The opposite of a hurkle-durkle.",
+    examples: [
+      { type: "example", text: '"Don\'t talk to me, I\'m locked in on this spreadsheet. I\'m in a flow state."' },
+      { type: "example", text: '"She put on her noise-canceling headphones and got locked in. Finished the whole project in two hours."' }
+    ],
+    origin: "Sports and gaming terminology, became general productivity slang on TikTok around 2023-2024."
+  },
+  {
+    term: "IYKYK (If You Know, You Know)",
+    category: "vibes",
+    tags: [{ label: "Phrase", type: "phrase" }, { label: "Internet", type: "neutral" }],
+    definition: "A knowing wink to people who share specific knowledge or experience. Used when you're referencing something without explaining it, creating an in-group. If you have to ask what it means, you're not in the group.",
+    examples: [
+      { type: "example", text: '"The parking spot behind the building that nobody uses. IYKYK."' },
+      { type: "example", text: '"Costco pizza. IYKYK."' }
+    ],
+    origin: "Internet abbreviation culture, widely used on Instagram, TikTok, and Twitter since the early 2020s."
+  },
+  {
+    term: "Dupe",
+    category: "vibes",
+    tags: [{ label: "Phrase", type: "phrase" }],
+    definition: "Short for 'duplicate.' A cheaper version of an expensive product that performs nearly the same. The thrift-minded person's best friend. Finding a good dupe is considered a flex, not a compromise.",
+    examples: [
+      { type: "example", text: '"This $12 moisturizer is a dupe for the $95 one and they\'re basically identical. Don\'t tell anyone."' },
+      { type: "example", text: '"Found a dupe for those $300 boots at Goodwill for $8. Dupe queen."' }
+    ],
+    origin: "Beauty and skincare TikTok, became mainstream consumer vocabulary around 2022-2023."
+  },
+  {
+    term: "Crash Out",
+    category: "vibes",
+    tags: [{ label: "Mood", type: "mood" }, { label: "Verb", type: "verb" }],
+    definition: "To reach an emotional breaking point and do something reckless or impulsive that you'll probably regret. The moment when composure leaves the building and chaos enters.",
+    examples: [
+      { type: "example", text: '"My crush left me on read and I\'m about to crash out. Someone take my phone."' },
+      { type: "example", text: '"He got passed over for the promotion and crashed out — sent a three-page email to the CEO at midnight."' }
+    ],
+    origin: "Surged on TikTok around 2023-2024 as a way to describe emotional implosion."
+  },
+  {
+    term: "Altered My Brain Chemistry",
+    category: "vibes",
+    tags: [{ label: "Phrase", type: "phrase" }, { label: "Mood", type: "mood" }],
+    definition: "Something so powerful, moving, or memorable that it fundamentally changed who you are as a person. Usually said about something surprisingly small — a perfect meal, a dog video, a song at the right moment.",
+    examples: [
+      { type: "example", text: '"That scene in the movie where the dog waits at the door? Altered my brain chemistry. I\'m not the same."' },
+      { type: "example", text: '"A stranger told me I had good energy and it altered my brain chemistry for a week."' }
+    ],
+    origin: "TikTok trend with over 50 million views under the hashtag, popular since 2023."
+  },
+  {
+    term: "Receipts",
+    category: "social",
+    tags: [{ label: "Social", type: "neutral" }, { label: "Phrase", type: "phrase" }],
+    definition: "Evidence. Proof. Screenshots, text messages, photos — anything that documents what actually happened versus what someone claims happened. 'Show the receipts' means prove it.",
+    examples: [
+      { type: "example", text: '"She said she never got the invitation. I have the receipts — read at 4:32 PM."' },
+      { type: "example", text: '"Don\'t come at me without receipts. I screenshot everything."' }
+    ],
+    origin: "Popularized by a 2002 interview with Whitney Houston ('Show me the receipts!'), became internet standard vocabulary."
+  },
+  {
+    term: "Clout",
+    category: "social",
+    tags: [{ label: "Social", type: "neutral" }],
+    definition: "Social influence, fame, or online following. Having clout means people pay attention to you. 'Clout chasing' is doing things specifically to gain attention or followers — and it's not a compliment.",
+    examples: [
+      { type: "example", text: '"She only posted that controversial take for the clout. Classic clout chasing."' },
+      { type: "example", text: '"He\'s got serious clout in the sneaker community. His opinions move markets."' }
+    ],
+    origin: "Hip-hop culture, became mainstream social media vocabulary in the late 2010s."
+  },
+  {
+    term: "Boujee / Bougie",
+    category: "compliments",
+    tags: [{ label: "Versatile", type: "neutral" }],
+    definition: "Acting fancy or high-class, whether or not you can actually afford it. Can be a compliment (appreciating the finer things) or a light roast (pretending to be fancier than you are). Sipping LaCroix out of a wine glass is boujee.",
+    examples: [
+      { type: "example", text: '"She orders oat milk lattes with two pumps of vanilla and a specific temperature. Very boujee."' },
+      { type: "example", text: '"His candle collection is unnecessarily boujee and I deeply respect it."' }
+    ],
+    origin: "Derived from 'bourgeoisie.' Popularized by Migos' 2016 song 'Bad and Boujee,' became everyday Gen Z vocabulary."
+  },
+  {
+    term: "Flex / Weird Flex But OK",
+    category: "phrases",
+    tags: [{ label: "Phrase", type: "phrase" }],
+    definition: "A 'flex' is showing off or bragging. 'Weird flex but OK' is the perfect response when someone brags about something that... isn't really worth bragging about. It's acknowledging the flex while questioning the judgment.",
+    examples: [
+      { type: "example", text: '"I\'ve read every terms of service agreement I\'ve ever been shown." — "Weird flex but OK."' },
+      { type: "example", text: '"She\'s low-key flexing her Costco haul on Instagram and honestly, valid."' }
+    ],
+    origin: "Hip-hop culture (flex as showing off) combined with internet humor. 'Weird flex but ok' became a meme around 2018."
+  }
+];
+
+// ─── RENDER LOGIC ───
+
+const categoryMeta = {
+  roasts: { label: "Roasts, Insults & Gentle Devastation", emoji: "🔥" },
+  compliments: { label: "Compliments & Hype", emoji: "✨" },
+  aesthetics: { label: "Aesthetics & the -Core Cinematic Universe", emoji: "🎨" },
+  phrases: { label: "Phrases, Sayings & Verbal Weapons", emoji: "💬" },
+  social: { label: "Social Life & Dating Terminology", emoji: "💘" },
+  internet: { label: "Internet Culture & Digital Brain Damage", emoji: "📱" },
+  vibes: { label: "Vibes, Moods & Emotional Weather", emoji: "🌊" }
+};
+
+const categoryOrder = ["roasts", "compliments", "aesthetics", "phrases", "social", "internet", "vibes"];
+
+function renderEntries(filteredEntries, activeFilter) {
+  const main = document.getElementById('mainContent');
+  const countBar = document.getElementById('countBar');
+
+  if (filteredEntries.length === 0) {
+    main.innerHTML = `<div class="empty-state"><div class="emoji">🫠</div><p>No results found. That's lowkey mid.</p></div>`;
+    countBar.textContent = '0 TERMS';
+    return;
+  }
+
+  countBar.textContent = `${filteredEntries.length} TERM${filteredEntries.length !== 1 ? 'S' : ''}`;
+
+  let html = '';
+  const grouped = {};
+  categoryOrder.forEach(cat => { grouped[cat] = []; });
+  filteredEntries.forEach(e => {
+    if (grouped[e.category]) grouped[e.category].push(e);
+  });
+
+  categoryOrder.forEach(cat => {
+    if (grouped[cat].length === 0) return;
+    const meta = categoryMeta[cat];
+    html += `<div class="category-header"><span class="emoji">${meta.emoji}</span> ${meta.label}</div>`;
+
+    grouped[cat].forEach(entry => {
+      const tagsHtml = entry.tags.map(t => `<span class="tag tag-${t.type}">${t.label}</span>`).join('');
+
+      let examplesHtml = '';
+      entry.examples.forEach(ex => {
+        if (ex.type === 'roast') {
+          examplesHtml += `<div class="roast-block"><div class="roast-label">The Roast</div><div class="example-text">${ex.text}</div></div>`;
+        } else {
+          examplesHtml += `<div class="example-block"><div class="example-label">Example</div><div class="example-text">${ex.text}</div></div>`;
+        }
+      });
+
+      const originHtml = entry.origin ? `<div class="origin-note">📍 ${entry.origin}</div>` : '';
+
+      html += `
+        <div class="entry" data-category="${entry.category}">
+          <div class="entry-header">
+            <span class="term">${entry.term}</span>
+            <div class="tags">${tagsHtml}</div>
+          </div>
+          <div class="definition">${entry.definition}</div>
+          ${examplesHtml}
+          ${originHtml}
+        </div>
+      `;
+    });
+  });
+
+  main.innerHTML = html;
+}
+
+// ─── SEARCH & FILTER ───
+
+let activeFilter = 'all';
+
+function applyFilters() {
+  const query = document.getElementById('searchInput').value.toLowerCase().trim();
+
+  let filtered = entries;
+
+  if (activeFilter !== 'all') {
+    filtered = filtered.filter(e => e.category === activeFilter);
+  }
+
+  if (query) {
+    filtered = filtered.filter(e => {
+      const searchable = [
+        e.term,
+        e.definition,
+        e.origin || '',
+        ...e.examples.map(ex => ex.text),
+        ...e.tags.map(t => t.label)
+      ].join(' ').toLowerCase();
+      return searchable.includes(query);
+    });
+  }
+
+  renderEntries(filtered, activeFilter);
+}
+
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+document.querySelectorAll('.pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    activeFilter = pill.dataset.filter;
+    applyFilters();
+  });
+});
+
+// Initial render
+applyFilters();
+</script>
+</body>
+</html>
