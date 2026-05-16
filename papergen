@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paper Studio — Printable Paper Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F6F4F0;
+    --surface: #FFFFFF;
+    --surface-hover: #FAFAF8;
+    --ink: #1A1816;
+    --ink-light: #6B6560;
+    --ink-lighter: #A8A19A;
+    --accent: #2C5F2D;
+    --accent-light: #E8F0E8;
+    --accent-hover: #234D24;
+    --border: #E5E1DB;
+    --border-light: #EEEAE5;
+    --shadow-sm: 0 1px 3px rgba(26,24,22,0.04);
+    --shadow-md: 0 4px 12px rgba(26,24,22,0.06);
+    --shadow-lg: 0 8px 30px rgba(26,24,22,0.08);
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── LAYOUT ─── */
+  .app {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 32px 28px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .logo h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .logo span {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-lighter);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ─── SECTION ─── */
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-lighter);
+    margin-bottom: 12px;
+  }
+
+  /* ─── PAPER TYPE SELECTOR ─── */
+  .paper-types {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .paper-type-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 10px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .paper-type-btn:hover {
+    background: var(--surface-hover);
+    border-color: var(--ink-lighter);
+  }
+
+  .paper-type-btn.active {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  .paper-type-btn .icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .paper-type-btn .icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .paper-type-btn .label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-light);
+  }
+
+  .paper-type-btn.active .label {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ─── CONTROLS ─── */
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .control-group + .control-group {
+    margin-top: 4px;
+  }
+
+  .control-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .control-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--ink-lighter);
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 2px solid var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 2px solid var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  input[type="color"] {
+    -webkit-appearance: none;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    width: 36px;
+    height: 28px;
+    cursor: pointer;
+    padding: 2px;
+    background: var(--surface);
+  }
+
+  input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+  input[type="color"]::-webkit-color-swatch { border: none; border-radius: 3px; }
+
+  .color-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .color-presets {
+    display: flex;
+    gap: 5px;
+  }
+
+  .color-preset {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+
+  .color-preset:hover {
+    transform: scale(1.15);
+  }
+
+  .color-preset.active {
+    border-color: var(--ink);
+    box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--ink);
+  }
+
+  select {
+    font-family: inherit;
+    font-size: 13px;
+    padding: 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+    outline: none;
+    width: 100%;
+  }
+
+  select:focus {
+    border-color: var(--accent);
+  }
+
+  /* ─── CHECKBOX ─── */
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--ink);
+    user-select: none;
+  }
+
+  .checkbox-row input[type="checkbox"] {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    background: var(--surface);
+  }
+
+  .checkbox-row input[type="checkbox"]:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .checkbox-row input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    width: 5px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  /* ─── PRINT BUTTON ─── */
+  .print-btn {
+    margin-top: auto;
+    padding: 14px 24px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.01em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .print-btn:hover {
+    background: var(--accent-hover);
+    box-shadow: var(--shadow-md);
+  }
+
+  .print-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* ─── PREVIEW ─── */
+  .preview-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background:
+      radial-gradient(circle at 20% 50%, rgba(44,95,45,0.03) 0%, transparent 50%),
+      linear-gradient(135deg, #F0EDE8 0%, #F6F4F0 50%, #EDE9E3 100%);
+    position: relative;
+  }
+
+  .page-wrapper {
+    position: relative;
+    filter: drop-shadow(0 2px 8px rgba(26,24,22,0.08)) drop-shadow(0 12px 40px rgba(26,24,22,0.1));
+  }
+
+  .page-canvas {
+    background: white;
+    width: 528px; /* 7.33in @ 72dpi - scaled preview */
+    height: 684px; /* 9.5in @ 72dpi - scaled preview */
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-canvas svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ─── FOOTER ─── */
+  .sidebar-footer {
+    padding-top: 16px;
+    border-top: 1px solid var(--border-light);
+    font-size: 11px;
+    color: var(--ink-lighter);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  /* ─── PRINT STYLES ─── */
+  @media print {
+    * { margin: 0 !important; padding: 0 !important; }
+
+    body {
+      background: white !important;
+    }
+
+    .sidebar, .preview-area { display: none !important; }
+
+    .app { display: block !important; }
+
+    #print-container {
+      display: block !important;
+      width: 100%;
+      height: 100%;
+    }
+
+    #print-container svg {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+
+    @page {
+      size: letter;
+      margin: 0;
+    }
+  }
+
+  #print-container {
+    display: none;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .app {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+    }
+    .sidebar {
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      max-height: 45vh;
+    }
+    .preview-area {
+      padding: 24px;
+    }
+    .page-canvas {
+      width: 100%;
+      max-width: 528px;
+      height: auto;
+      aspect-ratio: 8.5 / 11;
+    }
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section { animation: fadeIn 0.3s ease forwards; }
+  .section:nth-child(2) { animation-delay: 0.05s; }
+  .section:nth-child(3) { animation-delay: 0.1s; }
+  .section:nth-child(4) { animation-delay: 0.15s; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo">
+      <h1>Paper Studio</h1>
+      <span>Printables</span>
+    </div>
+
+    <!-- Paper Type -->
+    <div class="section">
+      <div class="section-label">Paper Type</div>
+      <div class="paper-types">
+        <button class="paper-type-btn active" data-type="staff" onclick="setPaperType('staff')">
+          <div class="icon">
+            <svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.2">
+              <line x1="4" y1="8" x2="32" y2="8"/><line x1="4" y1="13" x2="32" y2="13"/>
+              <line x1="4" y1="18" x2="32" y2="18"/><line x1="4" y1="23" x2="32" y2="23"/>
+              <line x1="4" y1="28" x2="32" y2="28"/>
+            </svg>
+          </div>
+          <span class="label">Music Staff</span>
+        </button>
+        <button class="paper-type-btn" data-type="graph" onclick="setPaperType('graph')">
+          <div class="icon">
+            <svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="0.7">
+              <line x1="4" y1="4" x2="4" y2="32"/><line x1="12" y1="4" x2="12" y2="32"/>
+              <line x1="20" y1="4" x2="20" y2="32"/><line x1="28" y1="4" x2="28" y2="32"/>
+              <line x1="4" y1="4" x2="32" y2="4"/><line x1="4" y1="12" x2="32" y2="12"/>
+              <line x1="4" y1="20" x2="32" y2="20"/><line x1="4" y1="28" x2="32" y2="28"/>
+            </svg>
+          </div>
+          <span class="label">Graph</span>
+        </button>
+        <button class="paper-type-btn" data-type="lined" onclick="setPaperType('lined')">
+          <div class="icon">
+            <svg viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="0.8">
+              <line x1="4" y1="8" x2="32" y2="8"/><line x1="4" y1="14" x2="32" y2="14"/>
+              <line x1="4" y1="20" x2="32" y2="20"/><line x1="4" y1="26" x2="32" y2="26"/>
+              <line x1="4" y1="32" x2="32" y2="32"/>
+            </svg>
+          </div>
+          <span class="label">Lined</span>
+        </button>
+        <button class="paper-type-btn" data-type="dot" onclick="setPaperType('dot')">
+          <div class="icon">
+            <svg viewBox="0 0 36 36" fill="currentColor">
+              <circle cx="8" cy="8" r="1.3"/><circle cx="18" cy="8" r="1.3"/><circle cx="28" cy="8" r="1.3"/>
+              <circle cx="8" cy="18" r="1.3"/><circle cx="18" cy="18" r="1.3"/><circle cx="28" cy="18" r="1.3"/>
+              <circle cx="8" cy="28" r="1.3"/><circle cx="18" cy="28" r="1.3"/><circle cx="28" cy="28" r="1.3"/>
+            </svg>
+          </div>
+          <span class="label">Dot Grid</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Options (dynamic) -->
+    <div class="section" id="options-container"></div>
+
+    <!-- Color -->
+    <div class="section">
+      <div class="section-label">Line Color</div>
+      <div class="color-row">
+        <input type="color" id="colorPicker" value="#B8C4D0">
+        <div class="color-presets">
+          <div class="color-preset active" style="background:#B8C4D0" data-color="#B8C4D0" onclick="setColor(this)"></div>
+          <div class="color-preset" style="background:#C4C4C4" data-color="#C4C4C4" onclick="setColor(this)"></div>
+          <div class="color-preset" style="background:#D4C5A9" data-color="#D4C5A9" onclick="setColor(this)"></div>
+          <div class="color-preset" style="background:#A8C5A0" data-color="#A8C5A0" onclick="setColor(this)"></div>
+          <div class="color-preset" style="background:#C9A8C5" data-color="#C9A8C5" onclick="setColor(this)"></div>
+          <div class="color-preset" style="background:#333333" data-color="#333333" onclick="setColor(this)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Print -->
+    <button class="print-btn" onclick="printPage()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+        <rect x="6" y="14" width="12" height="8"></rect>
+      </svg>
+      Print Paper
+    </button>
+
+    <div class="sidebar-footer">
+      Paper Studio · All paper types print at 8.5 × 11"
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview-area">
+    <div class="page-wrapper">
+      <div class="page-canvas" id="preview-canvas"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden print container -->
+<div id="print-container"></div>
+
+<script>
+// ─── STATE ───
+const state = {
+  type: 'staff',
+  color: '#B8C4D0',
+  lineWeight: 0.7,
+  // Staff
+  staffCount: 10,
+  staffSpacing: 8,
+  showClef: false,
+  showTimeSignature: false,
+  showBarLines: false,
+  // Graph
+  gridSize: 5, // mm
+  showMajorGrid: true,
+  majorEvery: 5,
+  // Lined
+  lineSpacing: 8, // mm
+  showMargin: true,
+  showHeader: false,
+  rulingStyle: 'wide', // wide, college, narrow
+  // Dot
+  dotSpacing: 5, // mm
+  dotSize: 0.8,
+};
+
+// Page dimensions in points (72 dpi)
+const PAGE = { w: 612, h: 792 }; // 8.5 x 11 inches
+const MARGIN = { top: 54, bottom: 54, left: 54, right: 54 }; // 0.75in margins
+
+// ─── PAPER TYPE SWITCH ───
+function setPaperType(type) {
+  state.type = type;
+  document.querySelectorAll('.paper-type-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.type === type);
+  });
+  renderOptions();
+  render();
+}
+
+// ─── COLOR ───
+function setColor(el) {
+  const color = el.dataset.color;
+  state.color = color;
+  document.getElementById('colorPicker').value = color;
+  document.querySelectorAll('.color-preset').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+document.getElementById('colorPicker').addEventListener('input', (e) => {
+  state.color = e.target.value;
+  document.querySelectorAll('.color-preset').forEach(p => p.classList.remove('active'));
+  render();
+});
+
+// ─── RENDER OPTIONS ───
+function renderOptions() {
+  const container = document.getElementById('options-container');
+  let html = '<div class="section-label">Options</div>';
+
+  switch(state.type) {
+    case 'staff':
+      html += slider('staffCount', 'Staff Groups', 1, 14, 1, state.staffCount, '');
+      html += slider('staffSpacing', 'Staff Spacing', 4, 14, 0.5, state.staffSpacing, 'mm');
+      html += slider('lineWeight', 'Line Weight', 0.3, 1.5, 0.1, state.lineWeight, 'pt');
+      html += checkbox('showClef', 'Show treble clef', state.showClef);
+      html += checkbox('showBarLines', 'Show bar lines', state.showBarLines);
+      break;
+    case 'graph':
+      html += slider('gridSize', 'Grid Size', 2, 10, 0.5, state.gridSize, 'mm');
+      html += slider('lineWeight', 'Line Weight', 0.2, 1.2, 0.1, state.lineWeight, 'pt');
+      html += checkbox('showMajorGrid', 'Show major grid lines', state.showMajorGrid);
+      if (state.showMajorGrid) {
+        html += slider('majorEvery', 'Major every', 3, 10, 1, state.majorEvery, ' cells');
+      }
+      break;
+    case 'lined':
+      html += `
+        <div class="control-group">
+          <label class="control-label">Ruling Style</label>
+          <select onchange="state.rulingStyle=this.value; updateLinedSpacing(); render();">
+            <option value="wide" ${state.rulingStyle==='wide'?'selected':''}>Wide Ruled (8.7mm)</option>
+            <option value="college" ${state.rulingStyle==='college'?'selected':''}>College Ruled (7.1mm)</option>
+            <option value="narrow" ${state.rulingStyle==='narrow'?'selected':''}>Narrow Ruled (6.4mm)</option>
+            <option value="custom" ${state.rulingStyle==='custom'?'selected':''}>Custom</option>
+          </select>
+        </div>`;
+      if (state.rulingStyle === 'custom') {
+        html += slider('lineSpacing', 'Line Spacing', 4, 12, 0.5, state.lineSpacing, 'mm');
+      }
+      html += slider('lineWeight', 'Line Weight', 0.2, 1.2, 0.1, state.lineWeight, 'pt');
+      html += checkbox('showMargin', 'Show left margin line', state.showMargin);
+      html += checkbox('showHeader', 'Show header lines', state.showHeader);
+      break;
+    case 'dot':
+      html += slider('dotSpacing', 'Dot Spacing', 3, 10, 0.5, state.dotSpacing, 'mm');
+      html += slider('dotSize', 'Dot Size', 0.3, 2, 0.1, state.dotSize, 'pt');
+      break;
+  }
+
+  container.innerHTML = html;
+}
+
+function updateLinedSpacing() {
+  const spacings = { wide: 8.7, college: 7.1, narrow: 6.4 };
+  if (state.rulingStyle !== 'custom') {
+    state.lineSpacing = spacings[state.rulingStyle] || 8;
+  }
+}
+
+function slider(key, label, min, max, step, value, unit) {
+  return `
+    <div class="control-group">
+      <label class="control-label">
+        ${label}
+        <span class="control-value" id="val-${key}">${value}${unit}</span>
+      </label>
+      <input type="range" min="${min}" max="${max}" step="${step}" value="${value}"
+        oninput="state.${key}=parseFloat(this.value); document.getElementById('val-${key}').textContent=this.value+'${unit}'; render();">
+    </div>`;
+}
+
+function checkbox(key, label, checked) {
+  return `
+    <label class="checkbox-row">
+      <input type="checkbox" ${checked ? 'checked' : ''}
+        onchange="state.${key}=this.checked; renderOptions(); render();">
+      ${label}
+    </label>`;
+}
+
+// ─── SVG GENERATION ───
+function mm2pt(mm) { return mm * 2.83465; }
+
+function generateSVG() {
+  const w = PAGE.w;
+  const h = PAGE.h;
+  const color = state.color;
+  const lw = state.lineWeight;
+
+  let content = '';
+
+  const area = {
+    x: MARGIN.left,
+    y: MARGIN.top,
+    w: w - MARGIN.left - MARGIN.right,
+    h: h - MARGIN.top - MARGIN.bottom,
+  };
+
+  switch(state.type) {
+    case 'staff':
+      content = generateStaff(area, color, lw);
+      break;
+    case 'graph':
+      content = generateGraph(area, color, lw);
+      break;
+    case 'lined':
+      content = generateLined(area, color, lw);
+      break;
+    case 'dot':
+      content = generateDot(area, color);
+      break;
+  }
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
+    <rect width="${w}" height="${h}" fill="white"/>
+    ${content}
+  </svg>`;
+}
+
+function generateStaff(area, color, lw) {
+  let svg = '';
+  const lineGap = mm2pt(state.staffSpacing / 4); // spacing between lines within a staff
+  const staffHeight = lineGap * 4; // 5 lines = 4 gaps
+  const numStaffs = state.staffCount;
+
+  // Calculate total space needed and distribute evenly
+  const totalStaffHeight = numStaffs * staffHeight;
+  const gapBetween = (area.h - totalStaffHeight) / (numStaffs + 1);
+
+  for (let s = 0; s < numStaffs; s++) {
+    const staffTop = area.y + gapBetween + s * (staffHeight + gapBetween);
+
+    // 5 staff lines
+    for (let i = 0; i < 5; i++) {
+      const y = staffTop + i * lineGap;
+      svg += `<line x1="${area.x}" y1="${y}" x2="${area.x + area.w}" y2="${y}" stroke="${color}" stroke-width="${lw}"/>`;
+    }
+
+    // Treble clef
+    if (state.showClef) {
+      const clefX = area.x + 16;
+      const clefCenter = staffTop + 2 * lineGap;
+      svg += generateTrebleClef(clefX, clefCenter, lineGap, color);
+    }
+
+    // Bar lines
+    if (state.showBarLines) {
+      const startX = state.showClef ? area.x + 38 : area.x;
+      const barWidth = (area.x + area.w - startX);
+      const numBars = 4;
+      for (let b = 0; b <= numBars; b++) {
+        const x = startX + (barWidth / numBars) * b;
+        if (b === 0 && !state.showClef) continue; // skip first if no clef (left edge is the barline)
+        svg += `<line x1="${x}" y1="${staffTop}" x2="${x}" y2="${staffTop + staffHeight}" stroke="${color}" stroke-width="${lw * 1.2}"/>`;
+      }
+      // Always draw left edge barline
+      svg += `<line x1="${area.x}" y1="${staffTop}" x2="${area.x}" y2="${staffTop + staffHeight}" stroke="${color}" stroke-width="${lw * 1.2}"/>`;
+      // Right edge barline
+      svg += `<line x1="${area.x + area.w}" y1="${staffTop}" x2="${area.x + area.w}" y2="${staffTop + staffHeight}" stroke="${color}" stroke-width="${lw * 1.2}"/>`;
+    }
+  }
+
+  return svg;
+}
+
+function generateTrebleClef(x, centerY, lineGap, color) {
+  // Simplified treble clef as a path
+  const scale = lineGap / 6;
+  return `<g transform="translate(${x}, ${centerY}) scale(${scale})">
+    <text font-family="serif" font-size="62" fill="${color}" text-anchor="middle" dominant-baseline="central" y="2">𝄞</text>
+  </g>`;
+}
+
+function generateGraph(area, color, lw) {
+  let svg = '';
+  const cellSize = mm2pt(state.gridSize);
+
+  // Minor grid
+  const opacity = 1;
+  // Vertical lines
+  for (let x = area.x; x <= area.x + area.w + 0.5; x += cellSize) {
+    svg += `<line x1="${x}" y1="${area.y}" x2="${x}" y2="${area.y + area.h}" stroke="${color}" stroke-width="${lw}" opacity="${opacity}"/>`;
+  }
+  // Horizontal lines
+  for (let y = area.y; y <= area.y + area.h + 0.5; y += cellSize) {
+    svg += `<line x1="${area.x}" y1="${y}" x2="${area.x + area.w}" y2="${y}" stroke="${color}" stroke-width="${lw}" opacity="${opacity}"/>`;
+  }
+
+  // Major grid
+  if (state.showMajorGrid) {
+    const majorSize = cellSize * state.majorEvery;
+    const majorLw = lw * 2;
+    for (let x = area.x; x <= area.x + area.w + 0.5; x += majorSize) {
+      svg += `<line x1="${x}" y1="${area.y}" x2="${x}" y2="${area.y + area.h}" stroke="${color}" stroke-width="${majorLw}"/>`;
+    }
+    for (let y = area.y; y <= area.y + area.h + 0.5; y += majorSize) {
+      svg += `<line x1="${area.x}" y1="${y}" x2="${area.x + area.w}" y2="${y}" stroke="${color}" stroke-width="${majorLw}"/>`;
+    }
+  }
+
+  return svg;
+}
+
+function generateLined(area, color, lw) {
+  let svg = '';
+  updateLinedSpacing();
+  const spacing = mm2pt(state.lineSpacing);
+
+  let startY = area.y;
+
+  // Header area
+  if (state.showHeader) {
+    // Title line
+    svg += `<line x1="${area.x}" y1="${area.y + 28}" x2="${area.x + area.w}" y2="${area.y + 28}" stroke="${color}" stroke-width="${lw * 1.5}"/>`;
+    // Date line
+    svg += `<line x1="${area.x + area.w - 140}" y1="${area.y + 6}" x2="${area.x + area.w}" y2="${area.y + 6}" stroke="${color}" stroke-width="${lw}"/>`;
+    // Separator
+    svg += `<line x1="${area.x}" y1="${area.y + 42}" x2="${area.x + area.w}" y2="${area.y + 42}" stroke="${color}" stroke-width="${lw * 1.8}"/>`;
+    startY = area.y + 42 + spacing;
+  }
+
+  // Horizontal ruled lines
+  for (let y = startY; y <= area.y + area.h + 0.5; y += spacing) {
+    svg += `<line x1="${area.x}" y1="${y}" x2="${area.x + area.w}" y2="${y}" stroke="${color}" stroke-width="${lw}"/>`;
+  }
+
+  // Left margin line
+  if (state.showMargin) {
+    const marginX = area.x + mm2pt(25); // standard 1-inch margin from left edge of printable area
+    svg += `<line x1="${marginX}" y1="${area.y}" x2="${marginX}" y2="${area.y + area.h}" stroke="#E8A0A0" stroke-width="${lw * 1.1}"/>`;
+  }
+
+  return svg;
+}
+
+function generateDot(area, color) {
+  let svg = '';
+  const spacing = mm2pt(state.dotSpacing);
+  const r = state.dotSize * 0.5;
+
+  for (let x = area.x; x <= area.x + area.w + 0.5; x += spacing) {
+    for (let y = area.y; y <= area.y + area.h + 0.5; y += spacing) {
+      svg += `<circle cx="${x}" cy="${y}" r="${r}" fill="${color}"/>`;
+    }
+  }
+
+  return svg;
+}
+
+// ─── RENDER ───
+function render() {
+  const svg = generateSVG();
+  document.getElementById('preview-canvas').innerHTML = svg;
+}
+
+// ─── PRINT ───
+function printPage() {
+  const svg = generateSVG();
+  document.getElementById('print-container').innerHTML = svg;
+  window.print();
+}
+
+// ─── INIT ───
+renderOptions();
+render();
+</script>
+
+</body>
+</html>
